@@ -1,0 +1,4433 @@
+/* =========================================================
+   Digital 2Moro — Core Visual Primitives (Phase 14C)
+   Container, section shell, panel, card base, CTA base, link row,
+   badge, divider. Every color/radius/spacing value below resolves
+   through --d2m-* custom properties (src/styles/variables.css,
+   src/styles/themes/{dark,light}.css) — no literal colors here, so
+   each class is automatically dark/light/system-theme-correct with
+   zero theme-specific CSS in this file.
+
+   Hover/focus states below are plain CSS `:hover`/`:focus-visible`
+   transitions (color/background/small transform only) — not a
+   motion library and not the "motion foundation" (Phase 14E), which
+   covers scroll-driven reveals, count-ups, and reduced-motion
+   orchestration. No icons, no glow effects, no full page layouts —
+   those are Phase 14D (icons), 16B (premium glow variants), and 18
+   (public rendering).
+========================================================= */
+
+/* ---- Document base (Phase 15D hardening, extended Phase 18A) ----
+   Found during Phase 15D's public-surface QA: no rule anywhere painted
+   --d2m-bg/--d2m-text-main onto the actual document, so every real page
+   (the Phase-1 /blog placeholder today, any future Phase 18 page) rendered
+   against the browser's unstyled default background/text color — plain
+   untagged text (anything not h1-h6/p/.d2m-* already covered by
+   typography.css) came out browser-default black regardless of theme,
+   which is a real contrast bug, not a placeholder gap: with data-theme=dark
+   and no page content isolating it in a Panel, that's effectively invisible
+   against a dark surface. Two properties on html/body, no layout, no new
+   selectors beyond the document root.
+
+   Phase 18A adds the sticky-footer flex column: body becomes a full-height
+   flex column of exactly Header / #main-content / Footer (the skip link is
+   position: absolute, so it's out of this flow); #main-content gets flex: 1
+   so short/empty pages (today's /offline, /saved, which render `null`) still
+   push Footer to the true bottom of the viewport instead of leaving it
+   floating mid-page. */
+html,
+body {
+  background: var(--d2m-bg);
+  color: var(--d2m-text-main);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#main-content {
+  flex: 1 1 auto;
+}
+
+/* ---- Container ---- */
+
+.d2m-container {
+  width: 100%;
+  max-width: var(--d2m-container-width);
+  margin-inline: auto;
+  padding-inline: clamp(var(--d2m-space-sm), 4vw, var(--d2m-space-xl));
+}
+
+/* ---- Section shell ---- */
+
+.d2m-section {
+  padding-block: clamp(var(--d2m-space-2xl), 8vw, var(--d2m-section-space));
+}
+
+/* ---- Panel ---- */
+
+.d2m-panel {
+  background: var(--d2m-bg-panel);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-lg);
+  padding: clamp(var(--d2m-space-lg), 4vw, var(--d2m-space-xl));
+}
+
+.d2m-panel--solid {
+  background: var(--d2m-bg-panel-solid);
+}
+
+/* ---- Card base ---- */
+
+.d2m-card {
+  display: grid;
+  gap: var(--d2m-space-sm);
+  padding: var(--d2m-space-md);
+  background: var(--d2m-bg-panel);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-lg);
+}
+
+.d2m-card--interactive {
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--d2m-ease-smooth),
+    border-color 0.2s var(--d2m-ease-smooth),
+    transform 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-card--interactive:hover,
+.d2m-card--interactive:focus-visible {
+  background: var(--d2m-bg-hover);
+  transform: translateY(-1px);
+}
+
+/* Phase 16D fix: this used to also zero the outline on :focus-visible,
+   which silently removed the ONLY keyboard focus indicator an interactive
+   card had — a real violation of "never remove a focus outline without a
+   replacement". Hover keeps no outline (mouse users don't need one);
+   focus-visible gets the same ring as every other interactive control. */
+.d2m-card--interactive:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-card__title {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+}
+
+.d2m-card__description {
+  color: var(--d2m-text-muted);
+}
+
+/* ---- CTA base ---- */
+
+.d2m-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--d2m-space-2xs);
+  padding: var(--d2m-space-xs) var(--d2m-space-lg);
+  border-radius: var(--d2m-radius-full);
+  border: 1px solid transparent;
+  font-family: var(--d2m-font-body);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--d2m-ease-smooth),
+    color 0.2s var(--d2m-ease-smooth),
+    border-color 0.2s var(--d2m-ease-smooth),
+    transform 0.15s var(--d2m-ease-smooth);
+}
+
+.d2m-cta--primary {
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+}
+
+.d2m-cta--primary:hover,
+.d2m-cta--primary:focus-visible {
+  background: var(--d2m-color-blue);
+}
+
+.d2m-cta--outline {
+  background: transparent;
+  border-color: var(--d2m-border-soft);
+  color: var(--d2m-text-main);
+}
+
+.d2m-cta--outline:hover,
+.d2m-cta--outline:focus-visible {
+  background: var(--d2m-bg-hover);
+}
+
+/* Phase 16D fix: Cta relied on the browser's default outline — functional,
+   but inconsistent with every other interactive control's explicit ring. */
+.d2m-cta:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-cta:active {
+  transform: scale(0.97);
+}
+
+/* ---- CTA "action" variant (Phase 16E) ----
+   Premium SaaS pill: white body, blue label, a trailing solid-blue circular
+   "bubble" with an arrow inside. Brand-invariant (literal white/blue, not
+   --d2m-bg/--d2m-text-main) — same reasoning as DashboardIcon's hover bubble
+   (docs/UI-COMPONENTS.md): a floating action pill reads as "the same premium
+   button" in both themes, it doesn't invert. The border + elevation shadow
+   keep it visually separated from a light-theme page's own white background,
+   where a plain white-on-white pill would otherwise disappear. */
+
+.d2m-cta--action {
+  gap: var(--d2m-space-sm);
+  padding: var(--d2m-space-3xs);
+  padding-left: var(--d2m-space-lg);
+  min-height: 48px;
+  background: var(--d2m-color-white);
+  color: var(--d2m-color-blue-cta);
+  border-color: var(--d2m-border-soft);
+  box-shadow: var(--d2m-shadow-elevated);
+  transition:
+    background-color 0.2s var(--d2m-ease-smooth),
+    color 0.2s var(--d2m-ease-smooth),
+    border-color 0.2s var(--d2m-ease-smooth),
+    transform 0.2s var(--d2m-ease-smooth);
+}
+
+/* Whole button shrinks slightly on hover (matches the brand's established
+   `.cta-btn:hover { scale(0.95) }` micro-interaction). */
+.d2m-cta--action:hover,
+.d2m-cta--action:focus-visible {
+  transform: scale(0.96);
+}
+
+.d2m-cta--action:active {
+  transform: scale(0.93);
+}
+
+/* Label renders twice, stacked — hover slides the "hover" copy up over the
+   "default" copy (same text, so it reads as a subtle re-affirm rather than
+   a content change). */
+.d2m-cta__label-wrap {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  padding-block: var(--d2m-space-3xs);
+  line-height: 1.2;
+}
+
+/* display:flex + align-items:center (not display:block) because
+   `--hover`'s `inset: 0` stretches it to the wrap's full height — without
+   flex-centering, its text top-aligns within that stretched box instead of
+   sitting centered like `--default`'s naturally single-line-height box. */
+.d2m-cta__label-text {
+  display: flex;
+  align-items: center;
+  transition: transform 0.35s var(--d2m-ease-smooth), opacity 0.3s var(--d2m-ease-smooth);
+}
+
+.d2m-cta__label-text--default {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.d2m-cta__label-text--hover {
+  position: absolute;
+  inset: 0;
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.d2m-cta--action:hover .d2m-cta__label-text--default,
+.d2m-cta--action:focus-visible .d2m-cta__label-text--default {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.d2m-cta--action:hover .d2m-cta__label-text--hover,
+.d2m-cta--action:focus-visible .d2m-cta__label-text--hover {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* The bubble itself never moves or recolors on hover — only the arrow glyph
+   inside rotates (diagonal at rest, straightens to horizontal on hover). */
+.d2m-cta__bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+}
+
+/* The bubble's DashboardIcon renders its own .d2m-icon-wrap, which sets its
+   own `color` (text-main) by default — override so the glyph inherits this
+   bubble's white instead, same override technique already used for the
+   "Light theme — static preview" box on /design-system. Also overrides
+   `.d2m-icon-wrap--plain`'s own hover color (blue-on-blue bug: hovering the
+   button also hovers this nested icon, and the plain-variant's built-in
+   hover treatment turns the glyph blue against the already-blue bubble) —
+   the glyph must stay white in every state here. */
+.d2m-cta__bubble .d2m-icon-wrap,
+.d2m-cta__bubble .d2m-icon-wrap--plain:hover,
+.d2m-cta__bubble .d2m-icon-wrap--plain:focus-visible {
+  color: inherit;
+  background: transparent;
+}
+
+.d2m-cta__bubble .tabler-icon {
+  transition: transform 0.3s var(--d2m-ease-smooth);
+}
+
+.d2m-cta--action:hover .d2m-cta__bubble .tabler-icon,
+.d2m-cta--action:focus-visible .d2m-cta__bubble .tabler-icon {
+  transform: rotate(45deg);
+}
+
+/* ---- Link row ---- */
+
+.d2m-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--d2m-space-md);
+  padding: var(--d2m-space-sm) 0;
+  border-bottom: 1px solid var(--d2m-border-faint);
+  text-decoration: none;
+  color: var(--d2m-text-main);
+}
+
+.d2m-link-row:last-child {
+  border-bottom: none;
+}
+
+.d2m-link-row__content {
+  display: grid;
+  gap: var(--d2m-space-3xs);
+  /* Phase 16D fix: flex items default to min-width:auto, which can push a
+     long title/description wider than the row instead of wrapping it. */
+  min-width: 0;
+}
+
+/* Phase 16D fix: same gap as Cta — relied on the browser default outline. */
+.d2m-link-row:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-link-row__title {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+}
+
+.d2m-link-row__description {
+  color: var(--d2m-text-muted);
+  font-size: 0.9rem;
+}
+
+.d2m-link-row__arrow {
+  flex-shrink: 0;
+  color: var(--d2m-text-muted);
+  transition:
+    transform 0.2s var(--d2m-ease-smooth),
+    color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-link-row:hover .d2m-link-row__arrow,
+.d2m-link-row:focus-visible .d2m-link-row__arrow {
+  transform: translateX(4px);
+  color: var(--d2m-text-main);
+}
+
+/* ---- Badge ---- */
+
+.d2m-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-3xs);
+  padding: 4px var(--d2m-space-xs);
+  border-radius: var(--d2m-radius-full);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-hover);
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.d2m-badge--accent {
+  border-color: transparent;
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+}
+
+.d2m-contact-portal__sync-badge--failed {
+  border-color: var(--d2m-color-danger);
+  color: var(--d2m-color-danger);
+}
+
+/* ---- Divider ---- */
+
+.d2m-divider {
+  width: 100%;
+  height: 1px;
+  border: 0;
+  background: var(--d2m-border-faint);
+  margin: 0;
+}
+
+/* ---- Icon wrapper (Phase 14D — src/components/icons/DashboardIcon.tsx) ----
+   Reference behavior (docs/design/phase-13-css-audit.md §3, `.service-card__icon`):
+   ~40px box, ~24-25px glyph, subtle default background, white-box/dark-glyph
+   on hover/active. Glyph color is NEVER set here or in the React layer — the
+   Tabler icon renders with its default `stroke="currentColor"`, so this
+   wrapper's `color` property is what actually colors the glyph. That's what
+   makes the icon automatically dark/light/system-theme-correct with zero
+   theme-specific icon CSS. */
+
+.d2m-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--d2m-radius-sm);
+  background: var(--d2m-bg-hover);
+  color: var(--d2m-text-main);
+  transition:
+    background-color 0.2s var(--d2m-ease-smooth),
+    color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-icon-wrap--sm {
+  width: 32px;
+  height: 32px;
+}
+
+.d2m-icon-wrap--md {
+  width: 40px;
+  height: 40px;
+}
+
+.d2m-icon-wrap--lg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Bare glyph — no box, no background, sized to the glyph itself (e.g. inline
+   next to a text label rather than a standalone hoverable control). */
+.d2m-icon-wrap--plain {
+  width: auto;
+  height: auto;
+  background: transparent;
+  border-radius: 0;
+}
+
+.d2m-icon-wrap:not(.d2m-icon-wrap--plain):hover,
+.d2m-icon-wrap:not(.d2m-icon-wrap--plain):focus-visible,
+.d2m-icon-wrap:not(.d2m-icon-wrap--plain).d2m-icon-wrap--active {
+  background: var(--d2m-color-white);
+  color: var(--d2m-color-black);
+}
+
+/* The plain variant has no box to invert to white — hover/active shifts to
+   the brand accent instead, so there's still visible feedback. */
+.d2m-icon-wrap--plain:hover,
+.d2m-icon-wrap--plain:focus-visible,
+.d2m-icon-wrap--plain.d2m-icon-wrap--active {
+  background: transparent;
+  color: var(--d2m-color-blue-cta);
+}
+
+.d2m-icon-wrap:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   Digital 2Moro - UI Primitive Library (Phase 16A)
+   Button, Input, Textarea, Select, Checkbox, Radio, Switch, Tabs,
+   Accordion, Alert, EmptyState, Spinner, FormField, Dialog, Toast.
+   Same rules as the Phase 14C/14D sections above: every color/
+   radius/spacing value resolves through a --d2m-* custom property
+   (including the new --d2m-color-danger/success/warning status
+   tokens, src/styles/variables.css), so every control is
+   automatically dark/light/system-theme-correct. Hover/focus
+   transitions are plain CSS, not a motion library. The spinner's
+   rotation is the one animation in this set - see its own comment
+   below for why it is in scope and how prefers-reduced-motion is
+   handled.
+========================================================= */
+
+/* ---- Visually-hidden utility (Spinner's accessible label, etc.) ---- */
+
+.d2m-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Button ---- */
+
+.d2m-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--d2m-space-2xs);
+  border-radius: var(--d2m-radius-md);
+  border: 1px solid transparent;
+  font-family: var(--d2m-font-body);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--d2m-ease-smooth),
+    border-color 0.2s var(--d2m-ease-smooth),
+    color 0.2s var(--d2m-ease-smooth),
+    opacity 0.2s var(--d2m-ease-smooth),
+    transform 0.15s var(--d2m-ease-smooth);
+}
+
+/* Phase 16E: a small universal press-feedback micro-interaction across every
+   variant — tactile "it registered my click" feedback, CSS-only (no
+   framer-motion). Skipped while :disabled/loading (opacity-faded state
+   shouldn't also visually shift). */
+.d2m-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.d2m-btn--sm {
+  min-height: 36px;
+  padding: 0 var(--d2m-space-sm);
+  font-size: 0.875rem;
+}
+
+.d2m-btn--md {
+  min-height: 44px;
+  padding: 0 var(--d2m-space-md);
+  font-size: 0.9375rem;
+}
+
+.d2m-btn--lg {
+  min-height: 52px;
+  padding: 0 var(--d2m-space-lg);
+  font-size: 1rem;
+}
+
+.d2m-btn--primary {
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+}
+
+.d2m-btn--primary:hover:not(:disabled) {
+  background: var(--d2m-color-blue);
+}
+
+.d2m-btn--secondary {
+  background: var(--d2m-bg-panel-solid);
+  border-color: var(--d2m-border-soft);
+  color: var(--d2m-text-main);
+}
+
+.d2m-btn--secondary:hover:not(:disabled) {
+  background: var(--d2m-bg-hover);
+}
+
+.d2m-btn--ghost {
+  background: transparent;
+  color: var(--d2m-text-main);
+}
+
+.d2m-btn--ghost:hover:not(:disabled) {
+  background: var(--d2m-bg-hover);
+}
+
+.d2m-btn--outline {
+  background: transparent;
+  border-color: var(--d2m-border-soft);
+  color: var(--d2m-text-main);
+}
+
+.d2m-btn--outline:hover:not(:disabled) {
+  background: var(--d2m-bg-hover);
+}
+
+.d2m-btn--danger {
+  background: var(--d2m-color-danger);
+  color: var(--d2m-color-white);
+}
+
+.d2m-btn--danger:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.d2m-btn:disabled,
+.d2m-btn--loading {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.d2m-btn:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+/* ---- Spinner ----
+   The one animation in this phase's scope: a loading indicator needs
+   *some* motion to read as "in progress" - this is a plain CSS
+   @keyframes rotation, not a motion library, and is slowed (not
+   removed - a fully static spinner gives no feedback at all) under
+   prefers-reduced-motion. */
+
+.d2m-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.d2m-spinner__ring {
+  display: block;
+  border-radius: var(--d2m-radius-full);
+  border: 2px solid var(--d2m-border-soft);
+  border-top-color: currentColor;
+  animation: d2m-spin 0.8s linear infinite;
+}
+
+.d2m-spinner--sm .d2m-spinner__ring {
+  width: 16px;
+  height: 16px;
+}
+
+.d2m-spinner--md .d2m-spinner__ring {
+  width: 24px;
+  height: 24px;
+}
+
+.d2m-spinner--lg .d2m-spinner__ring {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+@keyframes d2m-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d2m-spinner__ring {
+    animation-duration: 2.2s;
+  }
+}
+
+/* ---- Field controls (Input / Textarea / Select share this base) ---- */
+
+.d2m-field-control {
+  width: 100%;
+  background: var(--d2m-bg-panel);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-md);
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-body);
+  transition:
+    border-color 0.2s var(--d2m-ease-smooth),
+    background-color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-field-control::placeholder {
+  color: var(--d2m-text-muted);
+}
+
+.d2m-field-control--sm {
+  min-height: 36px;
+  padding: 0 var(--d2m-space-sm);
+  font-size: 0.875rem;
+}
+
+.d2m-field-control--md {
+  min-height: 44px;
+  padding: 0 var(--d2m-space-md);
+  font-size: 0.9375rem;
+}
+
+.d2m-field-control--lg {
+  min-height: 52px;
+  padding: 0 var(--d2m-space-lg);
+  font-size: 1rem;
+}
+
+/* Phase 22C: `--sm`/`--md` are 14px/15px on their own — below the 16px
+   threshold that keeps iOS Safari from auto-zooming the viewport when a
+   text input/select/textarea receives focus. `--lg` is already 16px.
+   Scoped to narrow viewports only (mobile Safari's own behavior, not a
+   desktop concern) so the tighter desktop type scale is untouched. */
+@media (max-width: 640px) {
+  .d2m-field-control--sm,
+  .d2m-field-control--md {
+    font-size: 1rem;
+  }
+}
+
+.d2m-field-control--textarea {
+  min-height: unset;
+  padding: var(--d2m-space-xs) var(--d2m-space-sm);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.d2m-field-control--select {
+  cursor: pointer;
+}
+
+.d2m-field-control:focus-visible,
+.d2m-field-control:focus {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 1px;
+  border-color: var(--d2m-color-blue-cta);
+}
+
+.d2m-field-control--invalid {
+  border-color: var(--d2m-color-danger);
+}
+
+.d2m-field-control:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---- Checkbox / Radio ----
+   Real native inputs themed via `accent-color` - full native keyboard/
+   screen-reader behavior, no custom box/checkmark to (mis)build. */
+
+.d2m-checkbox,
+.d2m-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-2xs);
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-body);
+  cursor: pointer;
+}
+
+.d2m-checkbox__input,
+.d2m-radio__input {
+  accent-color: var(--d2m-color-blue-cta);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.d2m-checkbox__input:focus-visible,
+.d2m-radio__input:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-checkbox__input--sm,
+.d2m-radio__input--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.d2m-checkbox__input--md,
+.d2m-radio__input--md {
+  width: 20px;
+  height: 20px;
+}
+
+.d2m-checkbox__input--lg,
+.d2m-radio__input--lg {
+  width: 24px;
+  height: 24px;
+}
+
+.d2m-checkbox__input:disabled,
+.d2m-radio__input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ---- Switch ----
+   A real hidden `<input type="checkbox">` (visually hidden via CSS
+   clipping, NOT display:none, so it stays focusable) drives a
+   track/thumb rendered entirely with CSS `:checked` sibling selectors. */
+
+.d2m-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-2xs);
+  cursor: pointer;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-body);
+}
+
+.d2m-switch__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.d2m-switch__track {
+  display: inline-flex;
+  align-items: center;
+  width: 44px;
+  height: 24px;
+  padding: 2px;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-bg-hover);
+  border: 1px solid var(--d2m-border-soft);
+  transition: background-color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-switch__thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-color-white);
+  transition: transform 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-switch__input:checked + .d2m-switch__track {
+  background: var(--d2m-color-blue-cta);
+  border-color: transparent;
+}
+
+.d2m-switch__input:checked + .d2m-switch__track .d2m-switch__thumb {
+  transform: translateX(20px);
+}
+
+.d2m-switch__input:focus-visible + .d2m-switch__track {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-switch__input:disabled + .d2m-switch__track {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---- Tabs ---- */
+
+.d2m-tabs__list {
+  display: flex;
+  gap: var(--d2m-space-2xs);
+  border-bottom: 1px solid var(--d2m-border-faint);
+  /* Phase 16D fix: many/long tab labels on a narrow viewport would
+     otherwise silently overflow the container (flex items don't wrap by
+     default). A horizontally-scrollable strip is the conventional mobile
+     tab-bar pattern, so this scrolls instead of introducing page-level
+     horizontal scroll or illegibly squeezing every tab. */
+  overflow-x: auto;
+}
+
+.d2m-tabs__tab {
+  padding: var(--d2m-space-xs) var(--d2m-space-sm);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition:
+    color 0.2s var(--d2m-ease-smooth),
+    border-color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-tabs__tab:hover:not(:disabled) {
+  color: var(--d2m-text-main);
+}
+
+.d2m-tabs__tab--active {
+  color: var(--d2m-text-main);
+  border-bottom-color: var(--d2m-color-blue-cta);
+}
+
+.d2m-tabs__tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.d2m-tabs__tab:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: -2px;
+}
+
+.d2m-tabs__panel {
+  padding-top: var(--d2m-space-md);
+}
+
+/* ---- Accordion ---- */
+
+.d2m-accordion__item {
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-md);
+  background: var(--d2m-bg-panel);
+}
+
+.d2m-accordion__item + .d2m-accordion__item {
+  margin-top: var(--d2m-space-2xs);
+}
+
+.d2m-accordion__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--d2m-space-sm);
+  padding: var(--d2m-space-sm) var(--d2m-space-md);
+  cursor: pointer;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+  list-style: none;
+}
+
+.d2m-accordion__title {
+  /* Phase 16D fix: same min-width:0 overflow safety as LinkRow's content. */
+  min-width: 0;
+}
+
+.d2m-accordion__trigger::-webkit-details-marker {
+  display: none;
+}
+
+.d2m-accordion__trigger:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: -2px;
+}
+
+.d2m-accordion__chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-accordion__item[open] > .d2m-accordion__trigger .d2m-accordion__chevron {
+  transform: rotate(90deg);
+}
+
+.d2m-accordion__content {
+  padding: 0 var(--d2m-space-md) var(--d2m-space-md);
+  color: var(--d2m-text-muted);
+}
+
+/* ---- Alert ---- */
+
+.d2m-alert {
+  display: flex;
+  gap: var(--d2m-space-sm);
+  padding: var(--d2m-space-sm) var(--d2m-space-md);
+  background: var(--d2m-bg-panel);
+  border: 1px solid var(--d2m-border-soft);
+  border-left: 4px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-md);
+}
+
+.d2m-alert__icon {
+  flex-shrink: 0;
+}
+
+.d2m-alert__content {
+  /* Phase 16D fix: same min-width:0 overflow safety as LinkRow/Accordion. */
+  min-width: 0;
+}
+
+.d2m-alert__title {
+  color: var(--d2m-text-main);
+  font-weight: 600;
+}
+
+.d2m-alert__description {
+  color: var(--d2m-text-muted);
+  font-size: 0.9rem;
+}
+
+.d2m-alert--info {
+  border-left-color: var(--d2m-color-blue-cta);
+}
+
+.d2m-alert--info .d2m-alert__icon {
+  color: var(--d2m-color-blue-cta);
+}
+
+.d2m-alert--success {
+  border-left-color: var(--d2m-color-success);
+}
+
+.d2m-alert--success .d2m-alert__icon {
+  color: var(--d2m-color-success);
+}
+
+.d2m-alert--warning {
+  border-left-color: var(--d2m-color-warning);
+}
+
+.d2m-alert--warning .d2m-alert__icon {
+  color: var(--d2m-color-warning);
+}
+
+.d2m-alert--error {
+  border-left-color: var(--d2m-color-danger);
+}
+
+.d2m-alert--error .d2m-alert__icon {
+  color: var(--d2m-color-danger);
+}
+
+/* ---- EmptyState ---- */
+
+.d2m-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: var(--d2m-space-sm);
+  padding: var(--d2m-space-2xl) var(--d2m-space-md);
+  text-align: center;
+}
+
+.d2m-empty-state__icon {
+  color: var(--d2m-text-muted);
+}
+
+.d2m-empty-state__title {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.d2m-empty-state__description {
+  color: var(--d2m-text-muted);
+  max-width: 480px;
+}
+
+.d2m-empty-state__action {
+  margin-top: var(--d2m-space-2xs);
+}
+
+/* ---- FormField ---- */
+
+.d2m-form-field {
+  display: grid;
+  gap: var(--d2m-space-2xs);
+}
+
+.d2m-form-field__label {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.d2m-form-field__required {
+  color: var(--d2m-color-danger);
+}
+
+.d2m-form-field__helper {
+  margin: 0;
+  color: var(--d2m-text-muted);
+  font-size: 0.8125rem;
+}
+
+.d2m-form-field__error {
+  margin: 0;
+  color: var(--d2m-color-danger);
+  font-size: 0.8125rem;
+}
+
+/* ---- Dialog (modal shell) ---- */
+
+.d2m-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--d2m-space-md);
+  /* Phase 16D fix: was a literal rgba(0,0,0,.6) — now a token (variables.css). */
+  background: var(--d2m-overlay-backdrop);
+}
+
+.d2m-dialog {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--d2m-bg-panel-solid);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-lg);
+  padding: var(--d2m-space-md);
+}
+
+.d2m-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--d2m-space-sm);
+  margin-bottom: var(--d2m-space-sm);
+}
+
+.d2m-dialog__title {
+  margin: 0;
+  /* Phase 16D fix: same min-width:0 overflow safety as Alert/Toast. */
+  min-width: 0;
+}
+
+.d2m-dialog__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Phase 16D fix: the visible glyph is 24px, but the clickable button had
+     no padding of its own — a ~24px tap target is well under the ~44px
+     comfortable-touch-target guideline. Padding grows the tap area without
+     growing the visible icon. */
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--d2m-text-muted);
+  border-radius: var(--d2m-radius-sm);
+  transition: color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-dialog__close:hover {
+  color: var(--d2m-text-main);
+}
+
+.d2m-dialog__close:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+/* ---- Toast (shell) ---- */
+
+.d2m-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--d2m-space-sm);
+  max-width: 420px;
+  padding: var(--d2m-space-sm) var(--d2m-space-md);
+  background: var(--d2m-bg-panel-solid);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-md);
+  /* Phase 16D fix: was a literal rgba(0,0,0,.35) — now a token (variables.css). */
+  box-shadow: var(--d2m-shadow-elevated);
+}
+
+.d2m-toast__icon {
+  flex-shrink: 0;
+}
+
+.d2m-toast__content {
+  /* Phase 16D fix: same min-width:0 overflow safety as Alert. */
+  min-width: 0;
+}
+
+.d2m-toast__title {
+  color: var(--d2m-text-main);
+  font-weight: 600;
+}
+
+.d2m-toast__description {
+  color: var(--d2m-text-muted);
+  font-size: 0.9rem;
+}
+
+.d2m-toast__dismiss {
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Phase 16D fix: same touch-target reasoning as Dialog's close button —
+     grows the tap area without growing the visible icon. */
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--d2m-text-muted);
+  border-radius: var(--d2m-radius-sm);
+  transition: color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-toast__dismiss:hover {
+  color: var(--d2m-text-main);
+}
+
+.d2m-toast__dismiss:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-toast--info .d2m-toast__icon {
+  color: var(--d2m-color-blue-cta);
+}
+
+.d2m-toast--success .d2m-toast__icon {
+  color: var(--d2m-color-success);
+}
+
+.d2m-toast--warning .d2m-toast__icon {
+  color: var(--d2m-color-warning);
+}
+
+.d2m-toast--error .d2m-toast__icon {
+  color: var(--d2m-color-danger);
+}
+
+/* ---- Theme toggle (Phase 15C) ----
+   Compact three-way segmented control (Dark / Light / System). Token-driven
+   only, so it's correct in both dark and light mode automatically — same
+   contract every other control here follows. */
+
+.d2m-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-3xs);
+  padding: var(--d2m-space-3xs);
+  background: var(--d2m-bg-panel);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-full);
+}
+
+.d2m-theme-toggle__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-3xs);
+  padding: var(--d2m-space-3xs) var(--d2m-space-sm);
+  background: transparent;
+  border: 0;
+  border-radius: var(--d2m-radius-full);
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 0.2s var(--d2m-ease-smooth),
+    background-color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-theme-toggle__option:hover {
+  color: var(--d2m-text-main);
+}
+
+.d2m-theme-toggle__option--active {
+  background: var(--d2m-bg-panel-solid);
+  color: var(--d2m-text-main);
+}
+
+.d2m-theme-toggle__option:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+/* Mobile: collapse to icon-only segments. Same visually-hidden technique as
+   .d2m-sr-only above, applied conditionally here (that utility class itself
+   is unconditional) — the label stays in the accessibility tree, it just
+   stops taking up layout space, so three segments stay comfortably tappable
+   at narrow widths instead of squeezing/wrapping long labels. */
+@media (max-width: 420px) {
+  .d2m-theme-toggle__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .d2m-theme-toggle__option {
+    padding: var(--d2m-space-3xs);
+  }
+}
+
+/* =========================================================
+   Premium components (Phase 16E) — src/components/ui/premium/
+   ImageShowcaseCard + TechnicalDetailCard. Every value still resolves
+   through --d2m-* tokens; TechnicalDetailCard forces `data-theme="dark"`
+   on its own root (same technique as the smoke page's existing
+   "Light theme — static preview" box, just inverted) so it reads
+   correctly as an always-atmospheric/dark card regardless of the
+   surrounding page's active theme — the same reasoning a code panel or
+   terminal panel stays dark on an otherwise light documentation site.
+========================================================= */
+
+/* ---- ImageShowcaseCard ---- */
+
+.d2m-showcase-card {
+  display: grid;
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-panel-solid);
+  overflow: hidden;
+}
+
+.d2m-showcase-card__media {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--d2m-bg-hover);
+}
+
+.d2m-showcase-card__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s var(--d2m-ease-smooth);
+}
+
+.d2m-showcase-card:hover .d2m-showcase-card__media img {
+  transform: scale(1.03);
+}
+
+.d2m-showcase-card__body {
+  display: grid;
+  gap: var(--d2m-space-sm);
+  padding: clamp(var(--d2m-space-md), 3vw, var(--d2m-space-lg));
+}
+
+.d2m-showcase-card__title {
+  margin: 0;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.d2m-showcase-card__description {
+  margin: 0;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  line-height: 1.6;
+}
+
+/* ---- TechnicalDetailCard ---- */
+
+.d2m-tech-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  gap: var(--d2m-space-md);
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-soft);
+  background-color: var(--d2m-bg);
+  background-image: url('/assets/images/backgrounds/technical-card-grain.png');
+  background-size: cover;
+  background-position: center;
+  padding: clamp(var(--d2m-space-lg), 3vw, var(--d2m-space-xl));
+  color: var(--d2m-text-main);
+  box-shadow: var(--d2m-shadow-elevated);
+}
+
+/* Soft technical-blue glow, atmospheric corner accent — the previously
+   unused --d2m-glow-blue token (defined Phase 14A, first real use here). */
+.d2m-tech-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -30%;
+  right: -20%;
+  width: 65%;
+  aspect-ratio: 1;
+  border-radius: var(--d2m-radius-full);
+  background: radial-gradient(circle, var(--d2m-glow-blue) 0%, transparent 70%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.d2m-tech-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-tech-card__title {
+  margin: 0;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.d2m-tech-card__description {
+  margin: 0;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  line-height: 1.6;
+}
+
+.d2m-tech-card__visual {
+  border-radius: var(--d2m-radius-md);
+  border: 1px solid var(--d2m-border-faint);
+  background: var(--d2m-bg-panel);
+  padding: var(--d2m-space-md);
+  min-height: 120px;
+}
+
+.d2m-tech-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--d2m-space-sm);
+}
+
+/* =========================================================
+   Premium components (Phase 16B) — src/components/ui/premium/
+   GlowCard, CtaButton, DiagramFrame, StatPill, IconLinkRow,
+   SectionEyebrow. Built on the Phase 14E motion foundation
+   (GlowCard/CtaButton use hoverLift/tapScale; DiagramFrame/StatPill
+   wrap MotionReveal/MotionNumber directly) — every value still
+   resolves through --d2m-* tokens. Distinct from (and doesn't modify)
+   Phase 16E's Cta "action" variant, ImageShowcaseCard, or
+   TechnicalDetailCard.
+========================================================= */
+
+/* ---- GlowCard ---- */
+
+.d2m-glow-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-panel);
+  padding: clamp(var(--d2m-space-lg), 3vw, var(--d2m-space-xl));
+}
+
+.d2m-glow-card::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  border-radius: var(--d2m-radius-full);
+  background: radial-gradient(circle, var(--d2m-glow-blue) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s var(--d2m-ease-smooth);
+  pointer-events: none;
+}
+
+.d2m-glow-card:hover::before,
+.d2m-glow-card:focus-within::before {
+  opacity: 0.6;
+}
+
+.d2m-glow-card--cyan::before {
+  background: radial-gradient(circle, var(--d2m-glow-cyan) 0%, transparent 60%);
+}
+
+.d2m-glow-card--violet::before {
+  background: radial-gradient(circle, var(--d2m-glow-violet) 0%, transparent 60%);
+}
+
+/* ---- CtaButton ---- */
+
+.d2m-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-sm);
+  min-height: 48px;
+  padding: var(--d2m-space-3xs) var(--d2m-space-3xs) var(--d2m-space-3xs) var(--d2m-space-lg);
+  border-radius: var(--d2m-radius-full);
+  border: 1px solid transparent;
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+  font-family: var(--d2m-font-body);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-cta-button:hover,
+.d2m-cta-button:focus-visible {
+  background: var(--d2m-color-blue);
+}
+
+.d2m-cta-button:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-cta-button__bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-color-white);
+  color: var(--d2m-color-blue-cta);
+}
+
+/* Same override technique as Cta's action-variant bubble (Phase 16E): the
+   icon's own .d2m-icon-wrap sets its own `color` (text-main) by default —
+   force it to inherit this bubble's blue instead. */
+.d2m-cta-button__bubble .d2m-icon-wrap {
+  color: inherit;
+}
+
+/* ---- DiagramFrame ---- */
+
+.d2m-diagram-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-panel-solid);
+  padding: clamp(var(--d2m-space-lg), 4vw, var(--d2m-space-xl));
+}
+
+.d2m-diagram-frame__spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at center, var(--d2m-glow-blue) 0%, transparent 65%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.d2m-diagram-frame__inner {
+  border-radius: var(--d2m-radius-md);
+  border: 1px solid var(--d2m-border-faint);
+  overflow: hidden;
+}
+
+.d2m-diagram-frame__caption {
+  margin: var(--d2m-space-sm) 0 0;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* ---- StatPill ---- */
+
+.d2m-stat-pill {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--d2m-space-3xs);
+  padding: var(--d2m-space-sm) var(--d2m-space-md);
+  /* Uses the same radius as every other box (Card/Panel/etc.), not
+     --d2m-radius-full — despite the component's name, a fully-rounded
+     "pill" shape read as visually inconsistent next to every other
+     rectangular surface on the page. */
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-panel);
+}
+
+.d2m-stat-pill__value {
+  margin: 0;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.d2m-stat-pill__label {
+  margin: 0;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: 0.8125rem;
+}
+
+/* ---- IconLinkRow ---- */
+
+.d2m-icon-link-row {
+  display: flex;
+  align-items: center;
+  gap: var(--d2m-space-sm);
+  padding: var(--d2m-space-sm) 0;
+  border-bottom: 1px solid var(--d2m-border-faint);
+  text-decoration: none;
+  color: var(--d2m-text-main);
+}
+
+.d2m-icon-link-row:last-child {
+  border-bottom: none;
+}
+
+.d2m-icon-link-row__content {
+  display: grid;
+  gap: var(--d2m-space-3xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.d2m-icon-link-row:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-icon-link-row__title {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+}
+
+.d2m-icon-link-row__description {
+  color: var(--d2m-text-muted);
+  font-size: 0.9rem;
+}
+
+.d2m-icon-link-row__arrow {
+  flex-shrink: 0;
+  color: var(--d2m-text-muted);
+  transition:
+    transform 0.2s var(--d2m-ease-smooth),
+    color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-icon-link-row:hover .d2m-icon-link-row__arrow,
+.d2m-icon-link-row:focus-visible .d2m-icon-link-row__arrow {
+  transform: translateX(4px);
+  color: var(--d2m-text-main);
+}
+
+/* ---- SectionEyebrow ---- */
+
+.d2m-section-eyebrow {
+  margin: 0;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   Smoke-page-only layout helpers (Phase 16C)
+   Used exclusively by src/app/(public)/design-system/ — not part of the
+   general design system's public API, just enough mobile-first grid/stack
+   plumbing to lay the demo content out. Mobile-first: single column by
+   default, a responsive auto-fit grid only from a moderate viewport up.
+========================================================= */
+
+.d2m-smoke-stack {
+  display: grid;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-smoke-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--d2m-space-sm);
+  margin-bottom: var(--d2m-space-sm);
+}
+
+.d2m-smoke-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-sm);
+}
+
+@media (min-width: 640px) {
+  /* auto-fit (not auto-fill): auto-fill reserves empty column tracks up to
+     however many fit at minmax's minimum width, so a grid with e.g. 3 items
+     in a container wide enough for 5 columns left 2 tracks empty and dead
+     space to the right instead of letting the 3 real items stretch to fill
+     it. auto-fit collapses those empty tracks so `1fr` redistributes the
+     freed space to the actual items — found via a real screenshot on
+     desktop width showing exactly this (3 image-showcase-cards not filling
+     the row). */
+  .d2m-smoke-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+.d2m-smoke-swatch-card {
+  display: grid;
+  gap: var(--d2m-space-2xs);
+  padding: var(--d2m-space-sm);
+  border: 1px solid var(--d2m-border-faint);
+  border-radius: var(--d2m-radius-md);
+}
+
+.d2m-smoke-swatch-card code {
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-mono);
+  font-size: 0.8125rem;
+}
+
+.d2m-smoke-swatch {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--d2m-radius-sm);
+}
+
+.d2m-smoke-theme-preview {
+  padding: var(--d2m-space-md);
+  border-radius: var(--d2m-radius-lg);
+  background: var(--d2m-bg);
+}
+
+/* =========================================================
+   Block renderer — dev-only placeholder spacing (Phase 17A/17D)
+   `UnknownBlock` (src/components/blocks/UnknownBlock.tsx) is invisible in
+   production; this only affects local development, where several stacked
+   not-yet-implemented/fallback blocks need a visible gap between them.
+========================================================= */
+
+.d2m-block-placeholder {
+  display: grid;
+  gap: var(--d2m-space-2xs);
+}
+
+.d2m-block-placeholder + .d2m-block-placeholder {
+  margin-top: var(--d2m-space-sm);
+}
+
+/* Phase 17D: a dashed outline in the existing `--d2m-color-danger` token
+   (already used by Alert's danger variant — no new color) marks the subset
+   of reasons that mean "something is actually wrong" (unknown blockType,
+   malformed entry, render error) vs. the plain panel used for ordinary
+   expected states (empty/incomplete/unsupported/draft). The reason label
+   text is still the primary signal — this is a secondary visual cue, not
+   the only one, so it isn't relying on color alone. */
+.d2m-block-placeholder--problem {
+  border: 1px dashed var(--d2m-color-danger);
+}
+
+/* =========================================================
+   Core block components (Phase 17B)
+   Layout-only CSS for the real block renderers in src/components/blocks/.
+   Every value resolves through an existing --d2m-* token; typography
+   (headings, .d2m-eyebrow/title/body-lg/mono/muted) and color/surface
+   treatment come from the existing typography.css/components.css rules
+   already applied to Container/Section/Panel/Card/Cta/Badge — these rules
+   only add the layout each block needs on top of that (grids, stacks,
+   media aspect ratio). Mobile-first: single column by default, multi-
+   column only from a moderate viewport up.
+========================================================= */
+
+/* ---- Hero ---- */
+
+.d2m-block-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--d2m-space-sm);
+  margin-top: var(--d2m-space-md);
+}
+
+/* ---- FeatureGrid ---- */
+
+.d2m-block-feature-grid__items {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-md);
+  margin-top: var(--d2m-space-lg);
+}
+
+@media (min-width: 640px) {
+  /* auto-fit, not auto-fill — see the .d2m-smoke-grid comment above for why:
+     auto-fill left empty column tracks (and therefore dead space) whenever
+     a featureGrid instance had fewer items than columns fit the container. */
+  .d2m-block-feature-grid__items {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+/* ---- Stats ---- */
+
+.d2m-block-stats__items {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-lg);
+  margin-top: var(--d2m-space-lg);
+}
+
+@media (min-width: 640px) {
+  .d2m-block-stats__items {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+.d2m-block-stats__item {
+  display: grid;
+  gap: var(--d2m-space-3xs);
+  text-align: center;
+}
+
+.d2m-block-stats__value {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.1;
+}
+
+.d2m-block-stats__label {
+  color: var(--d2m-text-muted);
+  font-size: 0.9rem;
+}
+
+/* ---- CTA / WebsiteAuditCTA / ContactPortalEmbed (shared "promo panel" shape) ---- */
+
+.d2m-block-cta__panel,
+.d2m-block-website-audit-cta__panel,
+.d2m-block-contact-cta__panel {
+  display: grid;
+  gap: var(--d2m-space-sm);
+  text-align: center;
+  justify-items: center;
+}
+
+.d2m-block-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--d2m-space-sm);
+}
+
+/* ---- ImageText ---- */
+
+.d2m-block-image-text__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-lg);
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .d2m-block-image-text__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .d2m-block-image-text--right .d2m-block-image-text__media {
+    order: 2;
+  }
+}
+
+.d2m-block-image-text__media img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--d2m-radius-lg);
+  display: block;
+}
+
+.d2m-block-image-text__content {
+  display: grid;
+  gap: var(--d2m-space-sm);
+}
+
+/* ---- Quote ---- */
+
+.d2m-block-quote__panel {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.d2m-block-quote__blockquote {
+  margin: 0;
+  display: grid;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-block-quote__attribution {
+  display: grid;
+  gap: var(--d2m-space-3xs);
+}
+
+/* ---- Checklist ---- */
+
+.d2m-block-checklist__items {
+  display: grid;
+  gap: var(--d2m-space-sm);
+  margin: var(--d2m-space-lg) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.d2m-block-checklist__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--d2m-space-2xs);
+}
+
+/* ---- Code ---- */
+
+.d2m-block-code__panel {
+  display: grid;
+  gap: var(--d2m-space-2xs);
+  overflow-x: auto;
+}
+
+.d2m-block-code__pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* =========================================================
+   Block styling variants (Phase 17C)
+   Optional, defensively-read `variant` treatments for Hero/FeatureGrid/
+   Stats (src/components/blocks/*.tsx) — every value still resolves through
+   an existing --d2m-* token, and every default (no `variant` field, or an
+   unrecognized one) renders byte-identical to Phase 17B's original CSS
+   above. Built on Phase 14E's motion foundation (MotionReveal/MotionStagger)
+   and Phase 16B's GlowCard — no new glow implementation, no new motion
+   library usage invented here.
+========================================================= */
+
+/* ---- Hero: cinematic ---- */
+
+.d2m-block-hero--cinematic {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.d2m-block-hero--cinematic::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(900px, 130vw);
+  aspect-ratio: 1;
+  z-index: -1;
+  border-radius: var(--d2m-radius-full);
+  background: radial-gradient(circle, var(--d2m-glow-blue) 0%, transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---- Hero: video background (e.g. the homepage hero) ---- */
+
+.d2m-block-hero--video {
+  min-height: min(90vh, 900px);
+  display: flex;
+  align-items: center;
+}
+
+.d2m-block-hero--video > .d2m-container {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.d2m-block-hero--video .d2m-display {
+  max-width: 1100px;
+  margin-inline: auto;
+  margin-block: var(--d2m-space-xl);
+  font-size: clamp(2.25rem, 4.8vw, 4rem);
+}
+
+.d2m-block-hero--video .d2m-block-hero__actions {
+  justify-content: center;
+}
+
+.d2m-block-hero--video .d2m-body-lg {
+  margin-inline: auto;
+}
+
+.d2m-block-hero__video-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.d2m-block-hero__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.d2m-block-hero__video-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.45) 60%, rgba(0, 0, 0, 0.75) 100%),
+    radial-gradient(circle at 50% 20%, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.4) 70%);
+}
+
+@media (max-width: 640px) {
+  .d2m-block-hero--video {
+    min-height: 70vh;
+  }
+}
+
+/* ---- FeatureGrid: bento ---- */
+
+@media (min-width: 640px) {
+  .d2m-block-feature-grid__items--bento > :first-child {
+    grid-column: span 2;
+  }
+}
+
+/* ---- FeatureGrid: bordered card ---- */
+
+.d2m-card--bordered {
+  border-width: 2px;
+  border-color: var(--d2m-border-soft);
+  background: var(--d2m-bg-panel-solid);
+}
+
+/* ---- Stats: dark panel ---- */
+
+.d2m-block-stats--dark-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg);
+}
+
+.d2m-block-stats--dark-panel::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  z-index: -1;
+  width: 50%;
+  aspect-ratio: 1;
+  border-radius: var(--d2m-radius-full);
+  background: radial-gradient(circle, var(--d2m-glow-blue) 0%, transparent 65%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* =========================================================
+   Public site shell — header, footer, skip link (Phase 18A)
+   The public route group's shared chrome, wired into
+   src/app/(public)/layout.tsx around whatever {children} renders. Every
+   value resolves through an existing --d2m-* token; Container (Phase 14C)
+   supplies the shared max-width/horizontal padding both Header and Footer
+   use internally — no new spacing primitive invented. Deliberately does
+   NOT wrap {children} itself in a Container/Section — every block (Phase
+   17B/17C) and future page already manages its own, including full-bleed
+   variants (cinematic hero, dark-panel stats) that need to reach the
+   viewport edge; forcing a Container around {children} here would
+   double-constrain those.
+========================================================= */
+
+/* ---- Skip link ----
+   Standard "skip to main content" pattern: visually hidden (same technique
+   as .d2m-sr-only above, applied conditionally here rather than reusing
+   that class directly, same approach .d2m-theme-toggle's mobile collapse
+   already took) until it receives keyboard focus, at which point it becomes
+   the first visible, focused element on the page. */
+
+.d2m-skip-link {
+  position: absolute;
+  z-index: 100;
+  padding: var(--d2m-space-2xs) var(--d2m-space-sm);
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+  border-radius: var(--d2m-radius-sm);
+  font-family: var(--d2m-font-body);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.d2m-skip-link:not(:focus-visible) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.d2m-skip-link:focus-visible {
+  top: var(--d2m-space-sm);
+  left: var(--d2m-space-sm);
+  outline: 2px solid var(--d2m-color-white);
+  outline-offset: 2px;
+}
+
+/* ---- Header ----
+   Rebuilt to visually match the bexon design workbench's Header.js/
+   Navbar.js: a real mega-menu (desktop: pure CSS :hover/:focus-within,
+   no JS) + a mobile slide-in panel (HeaderMobileNav.tsx, the only client
+   component here besides ThemeToggle). Sticky via plain `position: sticky`
+   with a permanent glass-blur background, rather than bexon's two-instance
+   (absolute-transparent + fade-in-solid-on-scroll) trick — see the comment
+   in Header.tsx for why. */
+
+.d2m-site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--d2m-border-faint);
+  background: color-mix(in srgb, var(--d2m-bg) 80%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.d2m-site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--d2m-space-md);
+  padding-block: var(--d2m-space-sm);
+}
+
+.d2m-site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.d2m-site-header__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--d2m-space-md);
+}
+
+.d2m-site-header__logo {
+  height: 28px;
+  width: auto;
+}
+
+/* Logo swap: pure CSS, same [data-theme]/prefers-color-scheme layering
+   src/styles/themes/{dark,light}.css already use — dark is the implicit
+   default (:root, [data-theme='dark'], and [data-theme='system'] without a
+   light OS preference), so the light-background (white) logo shows by
+   default; [data-theme='light'] and a light-preferring [data-theme='system']
+   are the only cases that need an explicit override. */
+.d2m-site-header__logo--dark {
+  display: block;
+}
+
+.d2m-site-header__logo--light {
+  display: none;
+}
+
+[data-theme='light'] .d2m-site-header__logo--dark {
+  display: none;
+}
+
+[data-theme='light'] .d2m-site-header__logo--light {
+  display: block;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme='system'] .d2m-site-header__logo--dark {
+    display: none;
+  }
+
+  [data-theme='system'] .d2m-site-header__logo--light {
+    display: block;
+  }
+}
+
+.d2m-site-header__cta {
+  display: none;
+  align-items: center;
+  padding: var(--d2m-space-2xs) var(--d2m-space-md);
+  background: var(--d2m-color-blue);
+  color: var(--d2m-color-white);
+  border-radius: var(--d2m-radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s var(--d2m-ease-smooth);
+}
+
+@media (min-width: 992px) {
+  .d2m-site-header__cta {
+    display: inline-flex;
+  }
+}
+
+.d2m-site-header__cta:hover {
+  background: var(--d2m-color-blue-cta);
+}
+
+/* ---- Desktop mega-menu: pure CSS hover/focus, no JS ---- */
+
+.d2m-mega-nav {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .d2m-mega-nav {
+    display: block;
+  }
+}
+
+.d2m-mega-nav > ul {
+  display: flex;
+  align-items: center;
+  gap: var(--d2m-space-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.d2m-mega-nav__item {
+  position: relative;
+}
+
+.d2m-mega-nav__item > a {
+  display: inline-block;
+  padding-block: var(--d2m-space-sm);
+  color: var(--d2m-text-muted);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-mega-nav__item:hover > a,
+.d2m-mega-nav__item:focus-within > a {
+  color: var(--d2m-text-main);
+}
+
+.d2m-mega-nav__panel {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: var(--d2m-space-2xs);
+  width: max-content;
+  max-width: 560px;
+  padding: var(--d2m-space-sm);
+  background: var(--d2m-bg-panel-solid);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-md);
+  box-shadow: var(--d2m-shadow-elevated);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(4px);
+  transition:
+    opacity 0.2s var(--d2m-ease-smooth),
+    transform 0.2s var(--d2m-ease-smooth),
+    visibility 0.2s;
+  z-index: 10;
+}
+
+.d2m-mega-nav__item:hover > .d2m-mega-nav__panel,
+.d2m-mega-nav__item:focus-within > .d2m-mega-nav__panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.d2m-mega-nav__link {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--d2m-space-xs);
+  padding: var(--d2m-space-xs);
+  border-radius: var(--d2m-radius-sm);
+  color: var(--d2m-text-muted);
+  text-decoration: none;
+  transition: background 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-mega-nav__link:hover {
+  background: var(--d2m-bg-hover);
+}
+
+.d2m-mega-nav__link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--d2m-radius-sm);
+  background: var(--d2m-bg-panel);
+  color: var(--d2m-color-blue);
+}
+
+.d2m-mega-nav__link-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.d2m-mega-nav__link-title {
+  color: var(--d2m-text-main);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.d2m-mega-nav__link-desc {
+  color: var(--d2m-text-muted);
+  font-size: 0.75rem;
+}
+
+.d2m-mega-nav__panel--portfolio {
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  max-width: 400px;
+}
+
+.d2m-mega-nav__portfolio-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--d2m-space-2xs);
+  border-radius: var(--d2m-radius-sm);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--d2m-text-muted);
+  font-size: 0.75rem;
+}
+
+.d2m-mega-nav__portfolio-item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--d2m-radius-sm);
+}
+
+.d2m-mega-nav__portfolio-item span {
+  padding-inline: var(--d2m-space-3xs);
+}
+
+/* ---- Mobile hamburger + slide-in panel (HeaderMobileNav.tsx) ---- */
+
+.d2m-header-mobile-toggle {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (min-width: 992px) {
+  .d2m-header-mobile-toggle {
+    display: none;
+  }
+}
+
+.d2m-header-mobile-toggle span {
+  display: block;
+  height: 2px;
+  background: var(--d2m-text-main);
+  border-radius: var(--d2m-radius-full);
+}
+
+.d2m-header-mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--d2m-overlay-backdrop);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s var(--d2m-ease-smooth),
+    visibility 0.3s;
+  z-index: 60;
+}
+
+.d2m-header-mobile-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.d2m-header-mobile-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(340px, 88vw);
+  background: var(--d2m-bg-panel-solid);
+  border-left: 1px solid var(--d2m-border-soft);
+  transform: translateX(100%);
+  transition: transform 0.3s var(--d2m-ease-smooth);
+  z-index: 70;
+  overflow-y: auto;
+}
+
+.d2m-header-mobile-panel.is-open {
+  transform: translateX(0);
+}
+
+.d2m-header-mobile-panel__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--d2m-space-md);
+  border-bottom: 1px solid var(--d2m-border-faint);
+}
+
+.d2m-header-mobile-panel__close {
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: var(--d2m-text-main);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.d2m-header-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  padding: var(--d2m-space-md);
+  gap: var(--d2m-space-2xs);
+}
+
+.d2m-header-mobile-nav__category summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--d2m-space-xs);
+  color: var(--d2m-text-main);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.d2m-header-mobile-nav__category summary::-webkit-details-marker {
+  display: none;
+}
+
+.d2m-header-mobile-nav__category summary a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.d2m-header-mobile-nav__category ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--d2m-space-xs) var(--d2m-space-sm);
+}
+
+.d2m-header-mobile-nav__category ul li {
+  margin-bottom: var(--d2m-space-2xs);
+}
+
+.d2m-header-mobile-nav__category ul a {
+  color: var(--d2m-text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.d2m-header-mobile-nav__cta {
+  margin-top: var(--d2m-space-sm);
+  padding: var(--d2m-space-sm);
+  text-align: center;
+  background: var(--d2m-color-blue);
+  color: var(--d2m-color-white);
+  border-radius: var(--d2m-radius-full);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ---- Footer ----
+   Rebuilt to visually match the bexon design workbench's Footer.js (CTA
+   banner + real migrated content — see footerNav.ts for the content and
+   the note on which links don't have a real destination page yet). Uses
+   only this repo's existing --d2m-* semantic tokens (bg/bg-panel/
+   bg-panel-solid, text-main/soft/muted, border-soft/faint, color-blue),
+   not bexon's own raw hex tokens — they resolve to the same values in
+   dark mode (this site's default) and additionally pick up this repo's
+   light theme for free, which bexon doesn't have. */
+
+.d2m-site-footer {
+  border-top: 1px solid var(--d2m-border-faint);
+  background: var(--d2m-bg);
+}
+
+/* CTA banner opening the footer, matching the default-homepage CTA. */
+.d2m-footer-cta {
+  padding-block: var(--d2m-space-2xl);
+  border-bottom: 1px solid var(--d2m-border-faint);
+}
+
+.d2m-footer-cta__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--d2m-space-lg);
+  text-align: center;
+}
+
+.d2m-footer-cta__title {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+.d2m-footer-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-2xs);
+  padding: var(--d2m-space-sm) var(--d2m-space-lg);
+  background: var(--d2m-color-white);
+  color: var(--d2m-color-black);
+  border-radius: var(--d2m-radius-full);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background 0.2s var(--d2m-ease-smooth),
+    color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-footer-cta__btn:hover {
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+}
+
+/* Brand + tagline */
+.d2m-footer-top {
+  padding-block: var(--d2m-space-2xl) var(--d2m-space-lg);
+  text-align: center;
+}
+
+.d2m-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-footer-tagline {
+  color: var(--d2m-text-muted);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.d2m-site-footer__logo {
+  height: 24px;
+  width: auto;
+}
+
+/* Same logo-swap technique as the header (above) applied to the smaller
+   footer mark. */
+.d2m-site-footer__logo--dark {
+  display: block;
+}
+
+.d2m-site-footer__logo--light {
+  display: none;
+}
+
+[data-theme='light'] .d2m-site-footer__logo--dark {
+  display: none;
+}
+
+[data-theme='light'] .d2m-site-footer__logo--light {
+  display: block;
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme='system'] .d2m-site-footer__logo--dark {
+    display: none;
+  }
+
+  [data-theme='system'] .d2m-site-footer__logo--light {
+    display: block;
+  }
+}
+
+/* Build/Scale/Transform/Resources nav groups */
+.d2m-footer-links {
+  padding-block: var(--d2m-space-lg) var(--d2m-space-2xl);
+}
+
+.d2m-footer-links__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--d2m-space-lg);
+}
+
+.d2m-footer-link-group__title {
+  color: var(--d2m-text-main);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin: 0 0 var(--d2m-space-sm);
+}
+
+.d2m-footer-link-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.d2m-footer-link-group ul li {
+  margin-bottom: var(--d2m-space-2xs);
+}
+
+.d2m-footer-link-group a {
+  color: var(--d2m-text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-footer-link-group a:hover {
+  color: var(--d2m-color-blue);
+}
+
+.d2m-footer-subgroup {
+  margin-top: var(--d2m-space-md);
+}
+
+.d2m-footer-subgroup__title {
+  display: block;
+  color: var(--d2m-text-main);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: var(--d2m-space-2xs);
+}
+
+.d2m-footer-subgroup ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.d2m-footer-subgroup ul li {
+  margin-bottom: var(--d2m-space-2xs);
+}
+
+/* "Digital Platforms We Build" mega-sitemap panel */
+.d2m-footer-platforms {
+  padding-bottom: var(--d2m-space-2xl);
+}
+
+.d2m-footer-platforms__panel {
+  background: var(--d2m-bg-panel);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-lg);
+  padding: var(--d2m-space-xl);
+}
+
+.d2m-footer-platforms__title {
+  color: var(--d2m-text-main);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 var(--d2m-space-xl);
+}
+
+.d2m-footer-platforms__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--d2m-space-lg) var(--d2m-space-md);
+}
+
+.d2m-footer-platform-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--d2m-space-2xs);
+  color: var(--d2m-text-main);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: var(--d2m-space-sm);
+}
+
+.d2m-footer-platform-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-bg-panel-solid);
+  border: 1px solid var(--d2m-border-soft);
+  color: var(--d2m-text-main);
+}
+
+.d2m-footer-platform-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.d2m-footer-platform-group ul li {
+  margin-bottom: var(--d2m-space-2xs);
+}
+
+.d2m-footer-platform-group a {
+  color: var(--d2m-text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-footer-platform-group a:hover {
+  color: var(--d2m-color-blue);
+}
+
+/* Trust badges + partner logos */
+.d2m-footer-trust {
+  padding-bottom: var(--d2m-space-2xl);
+}
+
+.d2m-footer-trust__badges {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--d2m-space-lg);
+  margin-bottom: var(--d2m-space-xl);
+}
+
+.d2m-footer-trust-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--d2m-space-3xs);
+}
+
+.d2m-footer-trust-badge__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-bg-panel-solid);
+  border: 1px solid var(--d2m-border-soft);
+  color: var(--d2m-text-main);
+  margin-bottom: var(--d2m-space-3xs);
+}
+
+.d2m-footer-trust-badge__title {
+  color: var(--d2m-text-main);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.d2m-footer-trust-badge__caption {
+  color: var(--d2m-text-muted);
+  font-size: 0.75rem;
+}
+
+.d2m-footer-partners {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--d2m-space-xl);
+}
+
+.d2m-footer-partners img {
+  height: 24px;
+  width: auto;
+  opacity: 0.7;
+  filter: grayscale(1) brightness(2);
+  transition: opacity 0.2s var(--d2m-ease-smooth);
+}
+
+[data-theme='light'] .d2m-footer-partners img {
+  filter: grayscale(1) brightness(0.4);
+}
+
+.d2m-footer-partners img:hover {
+  opacity: 1;
+}
+
+/* Disclaimer */
+.d2m-footer-disclaimer {
+  padding-bottom: var(--d2m-space-2xl);
+  text-align: center;
+}
+
+.d2m-footer-disclaimer h4 {
+  color: var(--d2m-text-main);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 var(--d2m-space-sm);
+}
+
+.d2m-footer-disclaimer p {
+  max-width: 900px;
+  margin: 0 auto;
+  color: var(--d2m-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.8;
+}
+
+/* Office locations */
+.d2m-footer-offices {
+  padding-bottom: var(--d2m-space-2xl);
+}
+
+.d2m-footer-offices__panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--d2m-space-lg);
+  background: var(--d2m-color-blue);
+  border-radius: var(--d2m-radius-lg);
+  padding: var(--d2m-space-xl);
+}
+
+.d2m-footer-office {
+  text-align: center;
+  color: var(--d2m-color-white);
+}
+
+.d2m-footer-office h5 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin: 0 0 var(--d2m-space-3xs);
+  color: var(--d2m-color-white);
+}
+
+.d2m-footer-office span {
+  display: block;
+  font-size: 0.875rem;
+  opacity: 0.85;
+  margin-bottom: var(--d2m-space-xs);
+}
+
+.d2m-footer-office a {
+  display: block;
+  color: var(--d2m-color-white);
+  font-size: 0.875rem;
+  opacity: 0.9;
+  text-decoration: none;
+}
+
+.d2m-footer-office a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Bottom bar */
+.d2m-site-footer__bottom {
+  padding-block: var(--d2m-space-md) var(--d2m-space-lg);
+  border-top: 1px solid var(--d2m-border-faint);
+}
+
+.d2m-site-footer__bottom-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--d2m-space-md);
+}
+
+.d2m-site-footer__nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--d2m-space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.d2m-site-footer__nav a {
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: 0.8125rem;
+  text-decoration: none;
+  transition: color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-site-footer__nav a:hover {
+  color: var(--d2m-text-main);
+}
+
+.d2m-site-footer__nav a:focus-visible {
+  color: var(--d2m-text-main);
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+.d2m-site-footer__meta {
+  color: var(--d2m-text-muted);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+
+.d2m-site-footer__meta strong {
+  color: var(--d2m-text-muted);
+}
+
+@media (max-width: 991px) {
+  .d2m-footer-links__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .d2m-footer-platforms__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .d2m-footer-trust__badges {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .d2m-footer-offices__panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575px) {
+  .d2m-footer-links__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .d2m-footer-platforms__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .d2m-footer-trust__badges {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--d2m-space-md);
+  }
+}
+
+/* =========================================================
+   Public content-page breadcrumbs (Phase 18D)
+   The blog article, dictionary term, and service detail pages each render
+   a plain <nav aria-label="Breadcrumb"><ol>...</ol></nav> trail with no
+   styling of its own — found during Phase 18D's responsive QA pass
+   rendering as a stacked plain list (each <li> on its own line) instead of
+   an inline trail. Same `display: flex` + `list-style: none` treatment
+   `.d2m-site-footer__nav ul` above already uses, not a new pattern.
+========================================================= */
+.d2m-breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--d2m-space-3xs);
+  list-style: none;
+  margin: 0 0 var(--d2m-space-sm);
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--d2m-text-muted);
+}
+
+.d2m-breadcrumb-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--d2m-space-3xs);
+}
+
+.d2m-breadcrumb-list li:not(:last-child)::after {
+  content: '/';
+  color: var(--d2m-text-muted);
+}
+
+.d2m-breadcrumb-list a {
+  color: var(--d2m-text-muted);
+  text-decoration: none;
+  transition: color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-breadcrumb-list a:hover {
+  color: var(--d2m-text-main);
+}
+
+.d2m-breadcrumb-list a:focus-visible {
+  color: var(--d2m-text-main);
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   Contact/project intake portal layout shell (Phase 22A)
+   `src/components/contact-portal/**`. Deliberately namespaced
+   `.d2m-contact-portal*` — distinct from the standalone intake app being
+   migrated (Z:\General\codes\digital2moro-project-intake), which already
+   defines its OWN same-named `.d2m-container`/`.d2m-panel`/`.d2m-section`
+   classes with different rules. This section only adds the layout
+   scaffolding those existing primitives (Container/Section/Panel/Card,
+   Phase 14C) don't already cover — the progress track, the step row, the
+   action button row, and the office-card grid — every value still resolves
+   through an existing --d2m-* token, no new tokens added. Real per-step
+   form fields land in Phase 22B; nothing here should need to change shape
+   when that phase adds them.
+========================================================= */
+
+.d2m-contact-portal {
+  display: grid;
+  /* Phase 22C: without an explicit column track, this grid's implicit
+     single column defaults to `auto`, which sizes to its content's
+     max-content width — letting `.d2m-contact-portal__progress`'s step
+     row grow past this container's own 288px available width regardless
+     of any `min-width: 0` on the children (that only bounds the
+     *minimum*, not this). `minmax(0, 1fr)` forces the column to fill
+     exactly the available width instead. Root cause traced during this
+     phase's 320px mobile QA pass — a real, measured overflow, not a
+     hypothetical one. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--d2m-space-md);
+}
+
+.d2m-contact-portal__progress {
+  display: grid;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-contact-portal__progress-track {
+  height: 8px;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-border-soft);
+  overflow: hidden;
+}
+
+.d2m-contact-portal__progress-fill {
+  height: 100%;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-color-blue-cta);
+  transition: width 0.3s var(--d2m-ease-smooth);
+}
+
+.d2m-contact-portal__steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--d2m-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.d2m-contact-portal__step {
+  display: flex;
+  align-items: center;
+  gap: var(--d2m-space-2xs);
+  color: var(--d2m-text-muted);
+  font-size: 0.875rem;
+}
+
+.d2m-contact-portal__step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--d2m-radius-full);
+  border: 1px solid var(--d2m-border-soft);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.d2m-contact-portal__step--active .d2m-contact-portal__step-index {
+  background: var(--d2m-color-blue-cta);
+  border-color: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+}
+
+.d2m-contact-portal__step--active .d2m-contact-portal__step-label {
+  color: var(--d2m-text-main);
+}
+
+.d2m-contact-portal__step--complete .d2m-contact-portal__step-index {
+  border-color: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-blue-cta);
+}
+
+.d2m-contact-portal__panel {
+  display: grid;
+  gap: var(--d2m-space-md);
+  padding: clamp(32px, 5vw, 52px);
+  border-radius: var(--d2m-radius-xl, 20px);
+}
+
+.d2m-contact-portal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-contact-portal__hint {
+  color: var(--d2m-text-muted);
+  font-size: 0.875rem;
+}
+
+/* Phase 22C: on mobile, Step3's form (7 fields + description) runs several
+   screens tall — without this, Continue/Back scroll far out of reach.
+   `position: sticky` (not `fixed`) keeps the bar pinned to the bottom of
+   the viewport only while still inside `.d2m-contact-portal`'s own height;
+   it naturally releases back into normal flow once a visitor scrolls past
+   the step content into the offices section below, so it never floats
+   over unrelated content. Deliberately NOT full-bleed (no negative
+   margin-inline to cancel Container's padding) — combined with `position:
+   sticky`, that produced a real 18px horizontal overflow at 320px width
+   (a flex auto-width container measuring wider than its own margin-
+   adjusted containing block once sticky positioning was involved),
+   caught during this phase's own mobile QA pass. Staying inset within
+   Container's existing padding avoids that interaction entirely. Desktop
+   is untouched — Phase 18A already deliberately kept the header
+   non-sticky to minimize the shell's z-index/stacking surface, and
+   desktop's shorter scroll distance doesn't need this. */
+@media (max-width: 640px) {
+  .d2m-contact-portal__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding-block: var(--d2m-space-sm);
+    background: var(--d2m-bg-panel-solid);
+    border-top: 1px solid var(--d2m-border-soft);
+  }
+}
+
+.d2m-contact-portal__offices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--d2m-space-md);
+  margin-block: var(--d2m-space-md);
+}
+
+.d2m-contact-portal__office {
+  display: grid;
+  gap: var(--d2m-space-3xs);
+}
+
+.d2m-contact-portal__office-country {
+  color: var(--d2m-text-main);
+  font-weight: 600;
+}
+
+.d2m-contact-portal__office-location {
+  color: var(--d2m-text-muted);
+}
+
+.d2m-contact-portal__office .d2m-badge {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.d2m-contact-portal__office a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.d2m-contact-portal__office a:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+/* =========================================================
+   Contact portal — real fields, selectable cards, review screen (Phase 22B)
+   Extends the Phase 22A section above. `.d2m-contact-portal__select-card`
+   restyles a `Checkbox`/`Radio` control's label (Phase 16A) into a card —
+   the selected-state highlight uses `:has(:checked)`, no extra JS state
+   needed. Every value still resolves through an existing --d2m-* token.
+========================================================= */
+
+/* 3 cards per row on desktop (matches the standalone intake portal's
+   .service-selector__grid), collapsing to 2 then 1 on smaller screens. */
+.d2m-contact-portal__card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: var(--d2m-space-sm);
+}
+@media (max-width: 900px) {
+  .d2m-contact-portal__card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .d2m-contact-portal__card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card = the clickable label. The native input stays in the DOM (real
+   keyboard/SR behaviour) but is visually hidden; selection is read via
+   :has(:checked). Layout + affordance mirror the intake reference's
+   .service-card. */
+.d2m-contact-portal__select-card {
+  position: relative;
+  display: block;
+  min-height: 170px;
+  padding: 24px;
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-md);
+  background: var(--d2m-bg-card, rgba(255, 255, 255, 0.02));
+  cursor: pointer;
+  transition:
+    background 0.35s var(--d2m-ease-smooth),
+    transform 0.35s var(--d2m-ease-smooth),
+    border-color 0.25s var(--d2m-ease-smooth);
+}
+.d2m-contact-portal__select-card:hover {
+  transform: translateY(-1px);
+  background: var(--d2m-bg-hover);
+}
+.d2m-contact-portal__select-card:has(:checked) {
+  border-color: var(--d2m-color-blue-cta);
+  background: var(--d2m-bg-hover);
+}
+
+/* Native input hidden but accessible; the whole card is the label, and the
+   focus ring is lifted onto the card via :has(:focus-visible). */
+.d2m-contact-portal__select-card .d2m-checkbox__input,
+.d2m-contact-portal__select-card .d2m-radio__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  margin: 0;
+}
+.d2m-contact-portal__select-card:has(:focus-visible) {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+.d2m-contact-portal__select-card .d2m-checkbox__label,
+.d2m-contact-portal__select-card .d2m-radio__label {
+  display: block;
+}
+
+.d2m-contact-portal__select-card-content {
+  display: grid;
+  gap: 24px;
+}
+.d2m-contact-portal__select-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Selection indicator: an empty circle that fills white with a black check
+   when the card is selected (the reference's .service-card__check). */
+.d2m-contact-portal__select-card-check {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--d2m-border-soft);
+  color: transparent;
+  background: transparent;
+  transition:
+    background-color 0.25s var(--d2m-ease-smooth),
+    color 0.25s var(--d2m-ease-smooth),
+    border-color 0.25s var(--d2m-ease-smooth);
+}
+.d2m-contact-portal__select-card:has(:checked) .d2m-contact-portal__select-card-check {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+/* Icon tile: the mega-menu / footer treatment on every card — a glass tile
+   with a white glyph at rest, blue tile + gelatine bounce on hover/selection
+   (same as the header mega-menu icons). */
+.d2m-contact-portal__select-card .d2m-icon-wrap {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--d2m-border-soft);
+  color: #ffffff;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+.d2m-contact-portal__select-card:hover .d2m-icon-wrap,
+.d2m-contact-portal__select-card:has(:checked) .d2m-icon-wrap {
+  background: var(--d2m-color-blue-cta);
+  color: #ffffff;
+  animation: gelatine 0.6s;
+}
+
+.d2m-contact-portal__select-card-body {
+  display: grid;
+  gap: 8px;
+}
+.d2m-contact-portal__select-card-title {
+  color: var(--d2m-text-main);
+  font-weight: 500;
+}
+.d2m-contact-portal__select-card-description {
+  color: var(--d2m-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.d2m-contact-portal__select-card-meta {
+  color: var(--d2m-text-muted);
+  font-size: 0.8125rem;
+}
+
+.d2m-contact-portal__form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-sm);
+  margin-top: var(--d2m-space-sm);
+}
+
+.d2m-form-field {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+.d2m-form-field__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.d2m-form-field__label {
+  color: #8e8e8e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.d2m-form-field__status {
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+.d2m-form-field__status.is-required {
+  color: #6e6e6e;
+}
+.d2m-form-field__status.is-optional {
+  color: rgba(255, 255, 255, 0.45);
+}
+.d2m-form-field__helper {
+  margin: 0;
+  max-width: 680px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Intake form controls — dark frosted fields, muted placeholders, and a
+   glassy-black native <select> popup, ported from the intake reference's
+   forms.css. Scoped to the portal so other forms are untouched. */
+.d2m-contact-portal__panel .d2m-field-control {
+  min-height: 56px;
+  padding: 0 20px;
+  font-size: 1rem;
+  background-color: rgba(26, 26, 26, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--d2m-text-main);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.d2m-contact-portal__panel .d2m-field-control::placeholder {
+  color: rgba(255, 255, 255, 0.36);
+}
+.d2m-contact-portal__panel .d2m-field-control:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.d2m-contact-portal__panel .d2m-field-control:focus {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+/* Native <select> control & popup styling */
+.d2m-contact-portal__panel .d2m-field-control--select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 24px center;
+  padding-right: 56px;
+  cursor: pointer;
+}
+.d2m-contact-portal__panel .d2m-field-control--select option {
+  background-color: #141414;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+.d2m-contact-portal__panel .d2m-field-control--select option:checked,
+.d2m-contact-portal__panel .d2m-field-control--select option:hover,
+.d2m-contact-portal__panel .d2m-field-control--select option:focus {
+  background-color: #222222 !important;
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   EDITOR SHELL (Tiptap project description editor)
+   Ported directly from digital2moro-project-intake
+========================================================= */
+
+/* =========================================================
+   EDITOR SHELL (Tiptap project description editor)
+   Ported directly from digital2moro-project-intake reference
+========================================================= */
+
+.d2m-editor-shell {
+  width: 100%;
+  overflow: hidden;
+  background: rgba(22, 22, 22, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.d2m-editor-shell:focus-within {
+  background: rgba(26, 26, 26, 0.8);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.d2m-editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.015);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.d2m-editor-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.65);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.d2m-editor-toolbar button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.d2m-editor-toolbar button.is-active {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
+}
+
+.d2m-editor-toolbar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.d2m-editor-content {
+  min-height: 220px;
+  padding: 22px 24px;
+  color: var(--d2m-text-main, #ffffff);
+}
+
+.d2m-editor-content .ProseMirror {
+  min-height: 180px;
+  outline: none;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.d2m-editor-content .ProseMirror p {
+  margin: 0 0 12px;
+}
+
+.d2m-editor-content .ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.d2m-editor-content .ProseMirror ul,
+.d2m-editor-content .ProseMirror ol {
+  padding-left: 22px;
+  margin: 0 0 12px;
+}
+
+.d2m-editor-content .ProseMirror a {
+  color: var(--d2m-color-blue-cta, #0b57ff);
+  text-decoration: underline;
+}
+
+.d2m-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.36);
+}
+
+.d2m-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.d2m-editor-footer .is-valid {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.d2m-editor-footer .is-warning {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.d2m-contact-portal__review-cards {
+  display: grid;
+  gap: var(--d2m-space-md);
+}
+
+.d2m-contact-portal__review-card {
+  display: grid;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-contact-portal__review-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-contact-portal__review-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--d2m-space-2xs);
+}
+
+.d2m-contact-portal__review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-contact-portal__review-item p {
+  color: var(--d2m-text-muted);
+}
+
+/* =========================================================
+   Legacy HTML review panel (Phase 29V)
+   Authenticated-preview-only structural summary for `legacyHtml` blocks —
+   see src/components/migration/LegacyHtmlReviewPanel.tsx. Layout-only,
+   every value resolves through an existing --d2m-* token.
+   ========================================================= */
+.d2m-legacy-review {
+  display: grid;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-legacy-review__list {
+  display: grid;
+  gap: var(--d2m-space-3xs);
+  margin: 0;
+  padding-left: var(--d2m-space-sm);
+  color: var(--d2m-text-muted);
+}
+
+.d2m-legacy-review__images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--d2m-space-2xs);
+}
+
+.d2m-legacy-review__images img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--d2m-radius-sm);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-hover);
+}
+
+/* =========================================================
+   Policy/legal page layout (Phase 29V)
+   Preview-only long-form-document treatment — sidebar table of contents +
+   narrow readable content column — see
+   src/components/migration/PolicyPageLayout.tsx. Direction only (sidebar +
+   narrow column + section rhythm) taken from the read-only WordPress
+   reference screenshot/export in src/styles/reference-styles/ (never
+   imported); every rule below resolves through an existing --d2m-* token.
+   Mobile-first: single stacked column by default (TOC renders first in DOM
+   order, so it naturally appears above the content when stacked, no `order`
+   override needed), two-column grid with a sticky sidebar from 900px up —
+   wide enough for a persistent sidebar to coexist with a comfortably
+   readable content column, unlike this codebase's existing 768px
+   breakpoint (used for a plain 2-up image/text split, not a sidebar).
+   ========================================================= */
+.d2m-policy-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-xl);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .d2m-policy-layout {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--d2m-space-2xl);
+  }
+
+  .d2m-policy-layout--no-toc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.d2m-policy-toc {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .d2m-policy-toc {
+    position: sticky;
+    top: var(--d2m-space-lg);
+    max-height: calc(100vh - var(--d2m-space-2xl));
+    overflow-y: auto;
+  }
+}
+
+.d2m-policy-toc__list {
+  display: grid;
+  gap: var(--d2m-space-3xs);
+  margin: var(--d2m-space-xs) 0 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--d2m-border-faint);
+}
+
+.d2m-policy-toc__link {
+  display: block;
+  padding: var(--d2m-space-3xs) var(--d2m-space-sm);
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+  color: var(--d2m-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    color 0.2s var(--d2m-ease-smooth),
+    border-color 0.2s var(--d2m-ease-smooth);
+}
+
+.d2m-policy-toc__link:hover,
+.d2m-policy-toc__link:focus-visible {
+  color: var(--d2m-text-main);
+  border-left-color: var(--d2m-color-blue-cta);
+}
+
+.d2m-policy-toc__link:focus-visible {
+  outline: 2px solid var(--d2m-color-blue-cta);
+  outline-offset: 2px;
+}
+
+/* Narrow, readable measure — independent of the outer Container's 1180px
+   max-width, deliberately capped well below it for long-form legal prose. */
+.d2m-policy-content {
+  display: block;
+  max-width: 68ch;
+  min-width: 0;
+}
+
+/* Every heading/paragraph rhythm rule below is scoped to this wrapper only
+   — global typography.css (h1-h6 { margin: 0 }) stays untouched for every
+   other page. PolicyRichText renders with `disableContainer`, so every
+   block's headings/paragraphs are plain flowing siblings here (no nested
+   per-block wrapper divs to complicate margin collapsing). */
+.d2m-policy-content h4 {
+  margin-bottom: var(--d2m-space-sm);
+}
+
+.d2m-policy-content h1 {
+  margin-bottom: var(--d2m-space-lg);
+}
+
+/* h2 is the only heading level that repeats as a true section divider on a
+   policy page — every occurrence gets the same, deliberate "new section"
+   gap before it (replacing the previous inconsistent 0px-within-a-block /
+   ~176-192px-at-a-block-boundary pattern with one uniform rhythm) and a
+   real gap after it, before its own paragraph (previously 0, per the
+   user's "too tight" feedback). No h2 ever appears as the page's very first
+   element (h4/h1 always precede it), so no `:first-child` reset is needed. */
+.d2m-policy-content h2 {
+  margin-top: var(--d2m-space-2xl);
+  margin-bottom: var(--d2m-space-sm);
+  scroll-margin-top: var(--d2m-space-lg);
+}
+
+.d2m-policy-content p {
+  margin-bottom: var(--d2m-space-xs);
+}
+
+.d2m-policy-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   Direct Next.js public site components (architecture pivot)
+   Layout-only CSS for src/components/public-site/** — the marketing pages
+   Next.js now owns directly (no Payload block schema). Every value
+   resolves through an existing --d2m-* token; no new colors, no imported
+   WordPress/Elementor CSS. Mobile-first: single column by default,
+   multi-column from the same breakpoints already used by the block CSS
+   above this section.
+   ========================================================= */
+
+/* ---- Pill badge (matches the source's `.d2m-pill-cta`) ---- */
+
+.d2m-public-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--d2m-space-sm);
+  padding: var(--d2m-space-3xs) var(--d2m-space-3xs) var(--d2m-space-3xs) var(--d2m-space-md);
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-bg-hover);
+  border: 1px solid var(--d2m-border-soft);
+  color: var(--d2m-text-muted);
+  font-size: 0.9375rem;
+}
+
+.d2m-public-pill__icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--d2m-color-blue-cta);
+  color: var(--d2m-color-white);
+}
+
+/* Same blue-on-blue bug as .d2m-cta__bubble — hovering the pill also hovers
+   this nested icon, and .d2m-icon-wrap--plain's built-in hover color would
+   otherwise turn the glyph blue against the already-blue circle. */
+.d2m-public-pill__icon .d2m-icon-wrap,
+.d2m-public-pill__icon .d2m-icon-wrap--plain:hover,
+.d2m-public-pill__icon .d2m-icon-wrap--plain:focus-visible {
+  color: inherit;
+  background: transparent;
+}
+
+/* ---- Full-bleed rows (breaks out of Container's max-width — deliberately
+   rendered as a Section child, never nested inside Container, so it spans
+   the section's full width) ---- */
+
+.d2m-public-bleed {
+  width: 100%;
+  padding-inline: clamp(8px, 2vw, 24px);
+  margin-top: var(--d2m-space-xl);
+}
+
+.d2m-public-hero__gallery {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-sm);
+}
+
+@media (min-width: 768px) {
+  .d2m-public-hero__gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.d2m-public-hero__gallery img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  border-radius: 30px;
+  border: 1px solid var(--d2m-border-soft);
+}
+
+/* ---- Image + content row (Problem visual, Pain Points visual) ---- */
+
+.d2m-public-image-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-lg);
+  align-items: center;
+}
+
+.d2m-public-image-row--spaced {
+  margin-top: var(--d2m-space-lg);
+}
+
+@media (min-width: 900px) {
+  .d2m-public-image-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.d2m-public-image-row__media {
+  border-radius: 30px;
+  border: 1px solid var(--d2m-border-soft);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+
+.d2m-public-image-row__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- Pain points: single-column list of horizontal rows, matching the
+   source's `.d2m-pain-flow`/`.d2m-pain-item` (not a card grid) ---- */
+
+.d2m-pain-points-section,
+.d2m-public-pain-points-section {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  border: none !important;
+}
+
+.d2m-public-pain-points {
+  display: flex;
+  flex-direction: column;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-public-pain-point {
+  display: flex;
+  align-items: center;
+  gap: var(--d2m-space-md);
+  background: var(--d2m-bg-panel);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-lg);
+  padding: var(--d2m-space-sm) var(--d2m-space-md);
+  transition: background 0.3s var(--d2m-ease-smooth), transform 0.3s var(--d2m-ease-smooth);
+}
+
+.d2m-public-pain-point:hover {
+  background: var(--d2m-bg-hover);
+  transform: translateY(-2px);
+}
+
+.d2m-public-pain-point__number {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--d2m-radius-md);
+  background: var(--d2m-border-faint);
+  color: var(--d2m-text-muted);
+  font-weight: 600;
+  transition: background 0.3s var(--d2m-ease-smooth), color 0.3s var(--d2m-ease-smooth);
+}
+
+.d2m-public-pain-point:hover .d2m-public-pain-point__number {
+  background: var(--d2m-color-white);
+  color: var(--d2m-color-black);
+}
+
+.d2m-public-process__trigger {
+  display: flex;
+  align-items: baseline;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-public-process__number {
+  font-family: var(--d2m-font-mono);
+  color: var(--d2m-text-muted);
+}
+
+.d2m-public-process__title {
+  font-weight: 600;
+  color: var(--d2m-text-main);
+}
+
+.d2m-public-process__content {
+  display: grid;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-public-before-after {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-md);
+  margin-top: var(--d2m-space-2xl);
+}
+
+@media (min-width: 768px) {
+  .d2m-public-before-after {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.d2m-public-before-after__card {
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-lg);
+  overflow: hidden;
+  background: var(--d2m-bg-panel);
+  transition: background 0.35s var(--d2m-ease-smooth), transform 0.35s var(--d2m-ease-smooth);
+}
+
+.d2m-public-before-after__card:hover {
+  background: var(--d2m-bg-hover);
+  transform: translateY(-4px);
+}
+
+.d2m-public-before-after__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--d2m-bg-panel-solid);
+}
+
+.d2m-public-before-after__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.02);
+  transition: filter 0.45s var(--d2m-ease-smooth), transform 0.45s var(--d2m-ease-smooth);
+}
+
+/* "Before" images render desaturated/dark until the card is hovered — same
+   treatment the source uses to visually sell the before/after contrast. */
+.d2m-public-before-after__card--before .d2m-public-before-after__media img {
+  filter: grayscale(100%) brightness(0.65);
+}
+
+.d2m-public-before-after__card--before:hover .d2m-public-before-after__media img {
+  filter: brightness(1) saturate(1);
+  transform: scale(1.06);
+}
+
+.d2m-public-before-after__card--after .d2m-public-before-after__media img {
+  filter: brightness(0.9) saturate(1.1);
+}
+
+.d2m-public-before-after__content {
+  padding: clamp(var(--d2m-space-md), 3vw, var(--d2m-space-lg));
+}
+
+.d2m-public-before-after__label {
+  display: inline-flex;
+  margin-bottom: var(--d2m-space-sm);
+  padding: 7px var(--d2m-space-sm);
+  border-radius: var(--d2m-radius-full);
+  border: 1px solid var(--d2m-border-soft);
+  color: var(--d2m-text-muted);
+  font-size: 0.8125rem;
+}
+
+.d2m-public-before-after__card--after .d2m-public-before-after__label {
+  background: var(--d2m-color-white);
+  color: var(--d2m-color-black);
+  border-color: var(--d2m-color-white);
+}
+
+.d2m-public-before-after__content ul {
+  display: grid;
+  gap: var(--d2m-space-2xs);
+  margin: var(--d2m-space-sm) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.d2m-public-before-after__content li {
+  color: var(--d2m-text-muted);
+}
+
+.d2m-public-before-after__card--after li {
+  color: var(--d2m-text-main);
+}
+
+.d2m-public-outcomes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--d2m-space-sm);
+  margin-top: var(--d2m-space-md);
+}
+
+@media (min-width: 1024px) {
+  .d2m-public-outcomes {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ---- Deliverables: flat grid + a static preview aside (the source's
+   hover-swap JS preview panel is simplified to one fixed image — see
+   PublicDeliverablesGrid's own doc comment) ---- */
+
+.d2m-public-deliverables-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-lg);
+  margin-top: var(--d2m-space-2xl);
+  align-items: start;
+}
+
+@media (min-width: 1025px) {
+  .d2m-public-deliverables-layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  }
+}
+
+.d2m-public-deliverables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-sm);
+}
+
+@media (min-width: 640px) {
+  .d2m-public-deliverables {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.d2m-public-deliverable__number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--d2m-radius-md);
+  margin-bottom: var(--d2m-space-sm);
+  background: var(--d2m-border-faint);
+  color: var(--d2m-text-muted);
+  transition: background 0.3s var(--d2m-ease-smooth), color 0.3s var(--d2m-ease-smooth);
+}
+
+.d2m-public-deliverable:hover .d2m-public-deliverable__number {
+  background: var(--d2m-color-white);
+  color: var(--d2m-color-black);
+}
+
+.d2m-public-deliverables-preview {
+  position: sticky;
+  top: var(--d2m-space-2xl);
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-lg);
+  overflow: hidden;
+  background: var(--d2m-bg-panel);
+}
+
+.d2m-public-deliverables-preview__media {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--d2m-bg-panel-solid);
+}
+
+.d2m-public-deliverables-preview__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.d2m-public-deliverables-preview__content {
+  padding: var(--d2m-space-md) var(--d2m-space-lg);
+}
+
+/* ---- Closing CTA: richer than the generic CTAButtonBlock panel — matches
+   the source's `.d2m-final-cta-inner` gradient card + side image ---- */
+
+.d2m-public-closing-cta {
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-faint);
+  overflow: hidden;
+  padding: clamp(var(--d2m-space-lg), 4vw, var(--d2m-space-2xl));
+  background:
+    radial-gradient(circle at 20% 20%, rgba(11, 87, 255, 0.35), transparent 40%),
+    radial-gradient(circle at 85% 70%, rgba(11, 87, 255, 0.25), transparent 50%),
+    linear-gradient(135deg, #020617 0%, #020c2b 50%, #03143f 100%);
+  transition: transform 0.35s var(--d2m-ease-smooth);
+}
+
+.d2m-public-closing-cta:hover {
+  transform: translateY(-4px);
+}
+
+.d2m-public-closing-cta__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--d2m-space-lg);
+  align-items: center;
+}
+
+.d2m-public-closing-cta__media {
+  order: -1;
+  border-radius: 30px;
+  overflow: hidden;
+  background: var(--d2m-border-faint);
+}
+
+.d2m-public-closing-cta__media img {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s var(--d2m-ease-smooth);
+}
+
+.d2m-public-closing-cta:hover .d2m-public-closing-cta__media img {
+  transform: scale(1.04);
+}
+
+.d2m-public-closing-cta__content p {
+  color: var(--d2m-text-muted);
+}
+
+@media (min-width: 900px) {
+  .d2m-public-closing-cta__inner {
+    grid-template-columns: 1fr 0.9fr;
+    gap: var(--d2m-space-xl);
+  }
+
+  .d2m-public-closing-cta__media {
+    order: 0;
+  }
+
+  .d2m-public-closing-cta__media img {
+    min-height: 360px;
+  }
+}
+
+/* ---- Image marquee (homepage showcase strip) — CSS-only infinite loop,
+   reconstructed scaffolding (see ImageMarquee's own doc comment) ---- */
+
+/* Position:relative so the black-mist edge overlay (::before) can layer
+   above the images. Transform/auto-scroll/drag are all JS-driven (see
+   ImageMarquee.tsx) — CSS animations can't be manually scrubbed by a drag
+   gesture (the animation engine keeps overriding any inline transform you
+   set), so this isn't a CSS @keyframes animation at all. */
+.d2m-marquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.d2m-marquee::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    var(--d2m-color-black) 0%,
+    rgba(0, 0, 0, 0.9) 10%,
+    transparent 38%,
+    transparent 62%,
+    rgba(0, 0, 0, 0.9) 90%,
+    var(--d2m-color-black) 100%
+  );
+}
+
+.d2m-marquee__track {
+  display: flex;
+  width: max-content;
+  gap: var(--d2m-space-2xs);
+  cursor: grab;
+  touch-action: pan-y;
+  will-change: transform;
+}
+
+.d2m-marquee__track--dragging {
+  cursor: grabbing;
+}
+
+.d2m-marquee__item {
+  flex: none;
+  width: clamp(220px, 22vw, 340px);
+  aspect-ratio: 4 / 3;
+  border-radius: var(--d2m-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-panel-solid);
+}
+
+.d2m-marquee__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.d2m-marquee-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--d2m-space-2xs);
+}
+
+/* ---- Portfolio scroll showcase — horizontal-drag portfolio row +
+   floating scroll-progress badge. New pattern, built on --d2m-* tokens. ---- */
+
+.d2m-portfolio-showcase {
+  padding-block: clamp(var(--d2m-space-2xl), 8vw, var(--d2m-section-space));
+}
+
+.d2m-portfolio-showcase__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--d2m-space-lg);
+  margin-bottom: var(--d2m-space-xl);
+}
+
+/* Tall scroll-jack runway (desktop / fine-pointer only — see the component's
+   own doc comment). Height is set inline in JS to exactly the row's own
+   scrollable distance; this just establishes the positioning context. */
+.d2m-portfolio-pin-wrapper {
+  position: relative;
+}
+
+/* Pinned centered in the viewport (not flush against the top) while its
+   tall wrapper scrolls past — `top: 50%` + `translateY(-50%)` is what gives
+   the "starts scrolling once it reaches the middle of the page" feel,
+   instead of engaging the instant it touches the viewport's top edge. */
+.d2m-portfolio-sticky {
+  position: sticky;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.d2m-portfolio-showcase__bleed {
+  position: relative;
+  width: 100%;
+  padding-block: clamp(var(--d2m-space-xl), 5vw, var(--d2m-space-2xl));
+  padding-inline: clamp(8px, 2vw, 24px);
+}
+
+.d2m-portfolio-scroll {
+  display: flex;
+  gap: var(--d2m-space-xl);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  cursor: grab;
+  scrollbar-width: none;
+}
+
+.d2m-portfolio-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.d2m-portfolio-scroll:active {
+  cursor: grabbing;
+}
+
+.d2m-portfolio-card {
+  position: relative;
+  flex: none;
+  /* Sized relative to the scroll container itself (not `vw`) — the
+     container's own bleed padding means `vw` consistently overshoots its
+     real content width, leaving no visible peek of the next card. */
+  width: min(1100px, calc(100% - 160px));
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: var(--d2m-space-xl);
+  padding: clamp(var(--d2m-space-lg), 3vw, var(--d2m-space-2xl));
+  border-radius: var(--d2m-radius-lg);
+  border: 1px solid var(--d2m-border-soft);
+  background: var(--d2m-bg-panel);
+  overflow: hidden;
+  transition:
+    transform 0.3s var(--d2m-ease-smooth),
+    border-color 0.3s var(--d2m-ease-smooth),
+    background 0.3s var(--d2m-ease-smooth);
+}
+
+@media (min-width: 768px) {
+  .d2m-portfolio-card {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
+}
+
+/* Subtle brand texture — the digital-lines pattern sits low-opacity behind
+   the content, not as a hover effect (the earlier rotated "ghost panel"
+   hover treatment caused a real rendering bug: its rotated, oversized box
+   could bleed past its own card into the next card in the scroll row,
+   reading as overlapping/ghosted text — removed rather than patched). */
+.d2m-portfolio-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/assets/images/backgrounds/digital-lines-pattern.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.d2m-portfolio-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.24);
+  background: var(--d2m-bg-hover);
+}
+
+.d2m-portfolio-card__media {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+  /* aspect-ratio: 16 / 10; */
+  border-radius: var(--d2m-radius-md);
+  overflow: hidden;
+  background: var(--d2m-bg-panel-solid);
+}
+
+.d2m-portfolio-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  transition: transform 0.4s var(--d2m-ease-smooth);
+}
+
+.d2m-portfolio-card:hover .d2m-portfolio-card__media img {
+  transform: scale(1.04);
+}
+
+.d2m-portfolio-card__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--d2m-space-sm);
+}
+
+.d2m-portfolio-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--d2m-space-2xs);
+}
+
+.d2m-portfolio-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--d2m-space-md);
+  margin-top: var(--d2m-space-lg);
+}
+
+.d2m-portfolio-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border: 1px solid var(--d2m-border-soft);
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-bg-panel-solid);
+  color: var(--d2m-text-main);
+  cursor: pointer;
+  transition: background 0.2s var(--d2m-ease-smooth), border-color 0.2s var(--d2m-ease-smooth), transform 0.15s var(--d2m-ease-smooth);
+}
+
+.d2m-portfolio-arrow:hover:not(:disabled) {
+  background: var(--d2m-bg-hover);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.d2m-portfolio-arrow:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.d2m-portfolio-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.d2m-portfolio-progress {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--d2m-radius-full);
+  background: var(--d2m-bg-panel-solid);
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--d2m-shadow-elevated);
+}
+
+.d2m-portfolio-progress svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.d2m-portfolio-progress__track {
+  fill: none;
+  stroke: var(--d2m-border-soft);
+  stroke-width: 3;
+}
+
+.d2m-portfolio-progress__fill {
+  fill: none;
+  stroke: var(--d2m-color-blue-cta);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 125.6; /* 2 * PI * 20 */
+  transition: stroke-dashoffset 0.15s var(--d2m-ease-smooth);
+}

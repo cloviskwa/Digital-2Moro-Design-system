@@ -1,0 +1,31 @@
+/* =========================================================
+   Digital 2Moro — Dark Theme (Phase 14B)
+   Semantic surface/text/border tokens for the dark theme — the
+   default brand experience per docs/DESIGN-SYSTEM.md.
+
+   Applied on :root (no attribute required — dark is the default,
+   so an unthemed document is already correct) AND explicitly on
+   [data-theme='dark'] (defensive/future-proof: Phase 15's toggle
+   will set data-theme to 'dark' | 'light' | 'system', and this
+   guarantees an explicit "dark" selection resolves identically to
+   the default, regardless of where the attribute ends up living).
+
+   No toggle, no persistence, no theme provider here — Phase 15 owns
+   the mechanism that sets data-theme. This file only guarantees the
+   token *values* are correct once it does.
+========================================================= */
+
+:root,
+[data-theme='dark'] {
+  --d2m-bg: var(--d2m-color-black);
+  --d2m-bg-panel: rgba(26, 26, 26, 0.45);
+  --d2m-bg-panel-solid: rgba(26, 26, 26, 0.95);
+  --d2m-bg-hover: rgba(255, 255, 255, 0.05);
+
+  --d2m-text-main: #ffffff;
+  --d2m-text-muted: rgba(255, 255, 255, 0.6);
+  --d2m-text-soft: rgba(255, 255, 255, 0.75);
+
+  --d2m-border-soft: rgba(255, 255, 255, 0.14);
+  --d2m-border-faint: rgba(255, 255, 255, 0.08);
+}

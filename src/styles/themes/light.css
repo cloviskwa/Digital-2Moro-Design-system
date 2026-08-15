@@ -1,0 +1,49 @@
+/* =========================================================
+   Digital 2Moro — Light Theme (Phase 14B)
+   Semantic surface/text/border token overrides for the polished
+   light theme. Mostly white/near-white surfaces with the same
+   Digital 2Moro blue accent (accent tokens are brand-invariant and
+   live in variables.css, unchanged here).
+
+   [data-theme='light'] — explicit light selection (Phase 15's
+   future toggle sets this attribute; nothing sets it yet).
+
+   [data-theme='system'] under `@media (prefers-color-scheme: light)`
+   — pure-CSS system-theme support with NO JavaScript, localStorage,
+   or theme provider: if a future toggle sets data-theme="system",
+   the OS light preference alone resolves these tokens correctly.
+   The dark branch needs no equivalent rule here — dark is already
+   the :root default (src/styles/themes/dark.css), so an OS-dark
+   preference under data-theme="system" already resolves correctly
+   with zero extra CSS.
+========================================================= */
+
+[data-theme='light'] {
+  --d2m-bg: #ffffff;
+  --d2m-bg-panel: rgba(0, 0, 0, 0.03);
+  --d2m-bg-panel-solid: #f1f2f4;
+  --d2m-bg-hover: rgba(0, 0, 0, 0.04);
+
+  --d2m-text-main: #0a0a0a;
+  --d2m-text-muted: rgba(10, 10, 10, 0.62);
+  --d2m-text-soft: rgba(10, 10, 10, 0.78);
+
+  --d2m-border-soft: rgba(0, 0, 0, 0.12);
+  --d2m-border-faint: rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme='system'] {
+    --d2m-bg: #ffffff;
+    --d2m-bg-panel: rgba(0, 0, 0, 0.03);
+    --d2m-bg-panel-solid: #f1f2f4;
+    --d2m-bg-hover: rgba(0, 0, 0, 0.04);
+
+    --d2m-text-main: #0a0a0a;
+    --d2m-text-muted: rgba(10, 10, 10, 0.62);
+    --d2m-text-soft: rgba(10, 10, 10, 0.78);
+
+    --d2m-border-soft: rgba(0, 0, 0, 0.12);
+    --d2m-border-faint: rgba(0, 0, 0, 0.08);
+  }
+}

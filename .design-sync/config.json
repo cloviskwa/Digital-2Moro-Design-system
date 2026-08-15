@@ -1,0 +1,19 @@
+{
+  "projectId": "1915a148-cec4-433a-b023-0675fed37bb5",
+  "shape": "package",
+  "pkg": "@digital2moro/ui",
+  "globalName": "D2M",
+  "tsconfig": "../../../tsconfig.json",
+  "srcDir": "../../../src/components",
+  "cssEntry": "styles.css",
+  "extraFonts": ["../fonts-src/rethink-sans.css"],
+  "readmeHeader": ".design-sync/conventions.md",
+  "overrides": {
+    "Dialog": { "cardMode": "single", "viewport": "480x360" },
+    "Input": { "cardMode": "column" },
+    "Textarea": { "cardMode": "column" }
+  },
+  "libOverrides": {
+    "dts.mjs": "src/ uses @/* path-alias imports; tsc's declaration emit doesn't rewrite them to relative specifiers, and our build mirrors src/ 1:1 under PKG_DIR, so ts-morph needs @/* -> ./* to resolve cross-file type imports"
+  }
+}

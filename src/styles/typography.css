@@ -1,0 +1,260 @@
+/* =========================================================
+   Digital 2Moro — Typography Foundation
+
+   Mobile-first, rem-based, six-tier breakpoint scale (base / 640 / 768 /
+   1024 / 1440 / 1920 — the same breakpoints already used elsewhere in
+   components.css, not a new arbitrary set). Every size is a custom
+   property redeclared per breakpoint, so h1–h6/p/utility classes just
+   reference the variable — this replaces the previous clamp()-based scale,
+   which had a real bug: `clamp(2.5rem, 5.5vw, 3.5rem)` only starts moving
+   off its floor once 5.5vw exceeds 2.5rem, i.e. above a ~727px viewport —
+   every real phone (320–480px) rendered a flat, non-responsive size.
+
+   Tokens only — no component styles, no motion, no icon rules.
+========================================================= */
+
+:root {
+  --d2m-fs-h1: 1.375rem; /* 22px */
+  --d2m-fs-h2: 1.125rem; /* 18px */
+  --d2m-fs-h3: 0.9375rem; /* 15px */
+  --d2m-fs-h4: 0.875rem; /* 14px */
+  --d2m-fs-h5: 0.75rem; /* 12px */
+  --d2m-fs-h6: 0.6875rem; /* 11px */
+  --d2m-fs-display: 1.75rem; /* 28px */
+
+  --d2m-fs-p-lg: 0.9375rem; /* 15px */
+  --d2m-fs-p-body: 0.875rem; /* 14px */
+  --d2m-fs-p-sm: 0.8125rem; /* 13px */
+}
+
+@media (min-width: 640px) {
+  :root {
+    --d2m-fs-h1: 2rem; /* 32px */
+    --d2m-fs-h2: 1.5rem; /* 24px */
+    --d2m-fs-h3: 1.125rem; /* 18px */
+    --d2m-fs-h4: 1rem; /* 16px */
+    --d2m-fs-h5: 0.875rem; /* 14px */
+    --d2m-fs-h6: 0.75rem; /* 12px */
+    --d2m-fs-display: 2.5rem; /* 40px */
+
+    --d2m-fs-p-lg: 1rem; /* 16px */
+    --d2m-fs-p-body: 0.9375rem; /* 15px */
+    --d2m-fs-p-sm: 0.875rem; /* 14px */
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --d2m-fs-h1: 2.25rem; /* 36px */
+    --d2m-fs-h2: 1.75rem; /* 28px */
+    --d2m-fs-h3: 1.25rem; /* 20px */
+    --d2m-fs-h4: 1.125rem; /* 18px */
+    --d2m-fs-h5: 0.9375rem; /* 15px */
+    --d2m-fs-h6: 0.8125rem; /* 13px */
+    --d2m-fs-display: 3rem; /* 48px */
+
+    --d2m-fs-p-lg: 1.0625rem; /* 17px */
+    --d2m-fs-p-body: 1rem; /* 16px */
+    --d2m-fs-p-sm: 0.9375rem; /* 15px */
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --d2m-fs-h1: 3rem; /* 48px */
+    --d2m-fs-h2: 2.25rem; /* 36px */
+    --d2m-fs-h3: 1.75rem; /* 28px */
+    --d2m-fs-h4: 1.375rem; /* 22px */
+    --d2m-fs-h5: 1.125rem; /* 18px */
+    --d2m-fs-h6: 0.9375rem; /* 15px */
+    --d2m-fs-display: 4rem; /* 64px */
+
+    --d2m-fs-p-lg: 1.125rem; /* 18px */
+    --d2m-fs-p-body: 1rem; /* 16px */
+    --d2m-fs-p-sm: 0.9375rem; /* 15px */
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --d2m-fs-h1: 3.75rem; /* 60px */
+    --d2m-fs-h2: 2.75rem; /* 44px */
+    --d2m-fs-h3: 2rem; /* 32px */
+    --d2m-fs-h4: 1.5rem; /* 24px */
+    --d2m-fs-h5: 1.25rem; /* 20px */
+    --d2m-fs-h6: 1rem; /* 16px */
+    --d2m-fs-display: 5rem; /* 80px */
+
+    --d2m-fs-p-lg: 1.25rem; /* 20px */
+    --d2m-fs-p-body: 1.0625rem; /* 17px */
+    --d2m-fs-p-sm: 1rem; /* 16px */
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --d2m-fs-h1: 4.5rem; /* 72px */
+    --d2m-fs-h2: 3.375rem; /* 54px */
+    --d2m-fs-h3: 2.5rem; /* 40px */
+    --d2m-fs-h4: 1.75rem; /* 28px */
+    --d2m-fs-h5: 1.375rem; /* 22px */
+    --d2m-fs-h6: 1.125rem; /* 18px */
+    --d2m-fs-display: 5.5rem; /* 88px */
+
+    --d2m-fs-p-lg: 1.375rem; /* 22px */
+    --d2m-fs-p-body: 1.125rem; /* 18px */
+    --d2m-fs-p-sm: 1.0625rem; /* 17px */
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+}
+
+p {
+  margin: 0;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: var(--d2m-fs-p-body);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+h1 {
+  font-size: var(--d2m-fs-h1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: var(--d2m-fs-h2);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+h3 {
+  font-size: var(--d2m-fs-h3);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+h4 {
+  font-size: var(--d2m-fs-h4);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+}
+
+h5 {
+  font-size: var(--d2m-fs-h5);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+h6 {
+  font-size: var(--d2m-fs-h6);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+}
+
+/* ---- Utility labels — for cases that don't map to a semantic
+   heading level (hero copy, section eyebrows, code/data). All share the
+   same responsive custom properties as h1–h6/p above, so a --d2m-fs-*
+   change updates every place that size shows up, semantic or not. ---- */
+
+.d2m-display {
+  margin: 0;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 700;
+  font-size: var(--d2m-fs-display);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.d2m-title {
+  margin: 0;
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-heading);
+  font-weight: 700;
+  font-size: var(--d2m-fs-h2); /* mirrors h2 */
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.d2m-body {
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: var(--d2m-fs-p-body);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+.d2m-body-lg {
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: var(--d2m-fs-p-lg);
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-wrap: break-word;
+}
+
+.d2m-caption,
+/* Same treatment as .d2m-caption, distinct name for its most common use —
+   a small kicker label sitting directly above a heading (matches the
+   reference `.d2m-eyebrow` role, see docs/design/phase-13-css-audit.md §3.7). */
+.d2m-eyebrow {
+  display: inline-block;
+  color: var(--d2m-text-muted);
+  font-family: var(--d2m-font-body);
+  font-size: var(--d2m-fs-p-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.d2m-mono {
+  color: var(--d2m-text-main);
+  font-family: var(--d2m-font-mono);
+  font-size: var(--d2m-fs-p-body);
+  line-height: 1.6;
+}
+
+/* Generic muted-text modifier — for any element that needs the muted tone
+   without changing its size/weight/transform (unlike .d2m-caption/.d2m-eyebrow,
+   which bundle a specific label treatment). */
+.d2m-muted {
+  color: var(--d2m-text-muted);
+}
+
+/* ---- Overflow protection — long unbroken strings (URLs, emails) never
+   force horizontal scroll on narrow viewports. ---- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+.d2m-display,
+.d2m-title,
+.d2m-body,
+.d2m-body-lg {
+  max-width: 100%;
+  overflow-wrap: break-word;
+}

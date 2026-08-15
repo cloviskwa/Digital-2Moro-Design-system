@@ -1,0 +1,77 @@
+/* =========================================================
+   Digital 2Moro — Raw Brand Tokens (Phase 14A, refined 14B)
+   Brand-invariant primitives ONLY — identical in dark, light, and
+   any future theme. Theme-dependent (semantic) tokens live in
+   src/styles/themes/dark.css and src/styles/themes/light.css.
+
+   Source of truth: docs/design/phase-14a-design-tokens.md,
+   docs/design/phase-14b-theme-token-preparation.md.
+
+   Phase 14B split this file: it originally also held the semantic
+   surface/text/border tokens (dark defaults + a [data-theme='light']
+   override block) inline. Those moved out to themes/dark.css and
+   themes/light.css so "raw brand token" vs. "theme-dependent token"
+   is a real file boundary, not just a comment — see the 14B doc §2.
+========================================================= */
+
+:root {
+  /* ---- Brand accent (theme-invariant) ---- */
+  --d2m-color-blue: #004fff;
+  --d2m-color-blue-cta: #0b57ff;
+  --d2m-color-white: #ffffff;
+  --d2m-color-black: #000000;
+
+  /* ---- Controlled glow accents (tokens only — no glow effects
+     implemented until a later phase; blue/cyan/violet, never a
+     wider palette) ---- */
+  --d2m-glow-blue: rgba(0, 79, 255, 0.55);
+  --d2m-glow-cyan: rgba(56, 189, 248, 0.4);
+  --d2m-glow-violet: rgba(139, 92, 246, 0.35);
+
+  /* ---- Status colors (Phase 16A) — brand-invariant, same reasoning as
+     the accent above: a danger/success/warning button or alert should
+     look the same in every theme. "Info" deliberately reuses the brand
+     blue rather than introducing a fourth hue. ---- */
+  --d2m-color-danger: #ef4444;
+  --d2m-color-success: #22c55e;
+  --d2m-color-warning: #f59e0b;
+
+  /* ---- Overlay / elevation (Phase 16D) — brand-invariant: a modal scrim
+     and an elevated-card shadow are conventionally black in every theme
+     (this is the same reasoning as the icon wrapper's white/black hover
+     swap, not an oversight). Extracted from Dialog/Toast so neither
+     component has a literal rgba(0,0,0,...) value of its own. ---- */
+  --d2m-overlay-backdrop: rgba(0, 0, 0, 0.6);
+  --d2m-shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* ---- Radii — large premium radii per approved direction ---- */
+  --d2m-radius-sm: 10px;
+  --d2m-radius-md: 16px;
+  --d2m-radius-lg: 30px;
+  --d2m-radius-full: 999px;
+
+  /* ---- Spacing scale (4/8px grid) ---- */
+  --d2m-space-3xs: 4px;
+  --d2m-space-2xs: 8px;
+  --d2m-space-xs: 12px;
+  --d2m-space-sm: 16px;
+  --d2m-space-md: 24px;
+  --d2m-space-lg: 32px;
+  --d2m-space-xl: 48px;
+  --d2m-space-2xl: 64px;
+  --d2m-space-3xl: 96px;
+
+  /* ---- Layout ---- */
+  --d2m-container-width: 1180px;
+  --d2m-section-space: 96px;
+
+  /* ---- Motion easing (component/motion implementation is a
+     later phase — this is the token only) ---- */
+  --d2m-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* ---- Fonts (fallback-safe stacks; no font loading/next-font
+     wiring yet — that is a later phase) ---- */
+  --d2m-font-heading: 'Rethink Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --d2m-font-body: 'Rethink Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --d2m-font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
